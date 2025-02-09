@@ -1,0 +1,188 @@
+-- CUSTOMER TABLE
+CREATE TABLE demeterboots.Customer (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('C', 'customer_seq', FALSE),
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Street VARCHAR(150),
+    PostCode VARCHAR(20) NOT NULL,
+    City VARCHAR(50),
+    Email VARCHAR(128) NOT NULL,
+    PhoneNumber VARCHAR(20) NOT NULL
+);
+
+-- MEASUREMENTS TABLE
+CREATE TABLE demeterboots.Measurements (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('M', 'measurement_seq', FALSE),
+    CustomerID VARCHAR(10) NOT NULL REFERENCES demeterboots.Customer(ID) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    Notes VARCHAR(500),
+    Feet DECIMAL NOT NULL,
+    Bunion DECIMAL NOT NULL,
+    HighPoint DECIMAL NOT NULL,
+    Heel DECIMAL NOT NULL,
+    Ankle DECIMAL NOT NULL,
+    Calf DECIMAL NOT NULL,
+    UnderKnee DECIMAL NOT NULL,
+    Height DECIMAL NOT NULL,
+    CalfHeight DECIMAL NOT NULL,
+    TMark DECIMAL NOT NULL,
+    ImagePath VARCHAR(500)
+);
+
+-- EMPLOYEE TABLE
+CREATE TABLE demeterboots.Employee (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('E', 'employee_seq', FALSE),
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Street VARCHAR(150),
+    PostCode VARCHAR(20) NOT NULL,
+    City VARCHAR(50),
+    Email VARCHAR(128) NOT NULL,
+    PhoneNumber VARCHAR(20) NOT NULL,
+    Username VARCHAR(50) UNIQUE NOT NULL,
+    Password VARCHAR(500) NOT NULL,
+    IsActive BOOL DEFAULT TRUE,
+    AccessLevel INT NOT NULL REFERENCES demeterboots.AccessLevel(ID),
+    StartDate DATE NOT NULL,
+    EndDate DATE
+);
+
+-- ORDER TABLE 
+CREATE TABLE demeterboots.Orders (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('O', 'order_seq', FALSE),
+    CustomerID VARCHAR(10) NOT NULL REFERENCES demeterboots.Customer(ID) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    PredictedFinish DATE NOT NULL,
+    Location VARCHAR(100) NOT NULL,
+    Total NUMERIC(10,2) NOT NULL,
+    IsWarrantyAccepted BOOL,
+    Status INT NOT NULL REFERENCES demeterboots.Status(ID)
+);
+
+-- ORDER LINE TABLE 
+CREATE TABLE demeterboots.OrderLine (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('OL', 'demeterboots.orderline_seq', TRUE),
+    OrderID VARCHAR(10) NOT NULL REFERENCES demeterboots.Orders(ID) ON DELETE CASCADE,
+    ProductTypeID INT NOT NULL REFERENCES demeterboots.ProductType(ID) ON DELETE CASCADE,
+    LeatherID INT NOT NULL REFERENCES demeterboots.Leather(ID) ON DELETE SET NULL,
+    ProductStyle JSONB NOT NULL,
+    Price NUMERIC(10,2) NOT NULL,
+    Notes VARCHAR(500)
+);
+
+-- REPAIR TABLE 
+CREATE TABLE demeterboots.Repair (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('R', 'repair_seq', FALSE),
+    CustomerID VARCHAR(10) NOT NULL REFERENCES demeterboots.Customer(ID) ON DELETE CASCADE,
+    Date DATE NOT NULL,
+    PredictedFinish DATE NOT NULL,
+    Location VARCHAR(100) NOT NULL,
+    Total NUMERIC(10,2) NOT NULL,
+    IsWarrantyAccepted BOOL,
+    Status INT NOT NULL REFERENCES demeterboots.Status(ID)
+);
+
+-- REPAIR LINE TABLE 
+CREATE TABLE demeterboots.RepairLine (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('RL', 'demeterboots.repairline_seq', TRUE),
+    RepairID VARCHAR(10) NOT NULL REFERENCES demeterboots.Repair(ID) ON DELETE CASCADE,
+    ProductTypeID INT NOT NULL REFERENCES demeterboots.ProductType(ID) ON DELETE CASCADE,
+    RepairCategoryID INT NOT NULL REFERENCES demeterboots.RepairCategory(ID) ON DELETE CASCADE,
+    Price NUMERIC(10,2) NOT NULL,
+    Notes VARCHAR(500)
+);
+
+-- INVOICE TABLE 
+CREATE TABLE demeterboots.Invoice (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('I', 'invoice_seq', FALSE),
+    CustomerID VARCHAR(10) NOT NULL REFERENCES demeterboots.Customer(ID) ON DELETE CASCADE,
+    Status INT NOT NULL REFERENCES demeterboots.Status(ID),
+    PaymentType INT NOT NULL REFERENCES demeterboots.PaymentType(ID),
+    Total NUMERIC(10,2) NOT NULL,
+    Date DATE NOT NULL,
+    PaymentDate DATE,
+    IsPaid BOOL
+);
+
+-- INVOICE LINE TABLE 
+CREATE TABLE demeterboots.InvoiceLine (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('IL', 'invoiceline_seq', TRUE),
+    InvoiceID VARCHAR(10) NOT NULL REFERENCES demeterboots.Invoice(ID) ON DELETE CASCADE,
+    TaskID VARCHAR(10) NOT NULL,
+    TaskType VARCHAR(10) CHECK (TaskType IN ('Order', 'Repair')),
+    Total NUMERIC(10,2) NOT NULL
+);
+
+-- JOB TABLE 
+CREATE TABLE demeterboots.Job (
+    ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('J', 'job_seq', FALSE),
+    EmployeeID VARCHAR(10) NOT NULL REFERENCES demeterboots.Employee(ID) ON DELETE CASCADE,
+    Status INT NOT NULL REFERENCES demeterboots.Status(ID),
+    TaskID VARCHAR(10) NOT NULL,
+    TaskType VARCHAR(10) CHECK (TaskType IN ('Order', 'Repair', 'Invoice'))
+);
+
+-- JOB NOTIFICATION TABLE 
+CREATE TABLE demeterboots.JobNotification (
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    PreviousEmployeeID VARCHAR(10) NOT NULL REFERENCES demeterboots.Employee(ID),
+    NewEmployeeID VARCHAR(10) NOT NULL REFERENCES demeterboots.Employee(ID),
+    IsNotified BOOL,
+    TaskID VARCHAR(10) NOT NULL,
+    TaskType VARCHAR(10) CHECK (TaskType IN ('Order', 'Repair', 'Invoice'))
+);
+
+-- ProductType Table 
+CREATE TABLE demeterboots.ProductType (
+    ID SERIAL PRIMARY KEY,
+    Description VARCHAR(100) NOT NULL
+);
+
+-- ProductStyle Table 
+CREATE TABLE demeterboots.ProductStyle (
+    ID SERIAL PRIMARY KEY,
+    ProductStyleTypeID INT NOT NULL,
+    Description VARCHAR(100) NOT NULL,
+    FOREIGN KEY (ProductStyleTypeID) REFERENCES demeterboots.ProductStyleType(ID) ON DELETE CASCADE
+);
+
+-- ProductStyleType Table 
+CREATE TABLE demeterboots.ProductStyleType (
+    ID SERIAL PRIMARY KEY,
+    Description VARCHAR(100) NOT NULL
+);
+
+-- RepairCategory Table 
+CREATE TABLE demeterboots.RepairCategory (
+    ID SERIAL PRIMARY KEY,
+    ProductTypeID INT NOT NULL,
+    Description VARCHAR(100) NOT NULL,
+    FOREIGN KEY (ProductTypeID) REFERENCES demeterboots.ProductType(ID) ON DELETE CASCADE
+);
+
+-- Leather Table 
+CREATE TABLE demeterboots.Leather (
+    ID SERIAL PRIMARY KEY,
+    Colour VARCHAR(100) NOT NULL,
+    Description VARCHAR(100),
+    ImagePath VARCHAR(500),
+    IsAvailable BOOL
+);
+
+-- Status Table 
+CREATE TABLE demeterboots.Status (
+	ID SERIAL PRIMARY KEY,
+	Description VARCHAR(100) NOT NULL
+);
+
+-- AccessLevel 
+CREATE TABLE demeterboots.AccessLevel (
+	ID SERIAL PRIMARY KEY,
+	Description VARCHAR(100) NOT NULL
+);
+
+-- PaymentType 
+CREATE TABLE demeterboots.PaymentType (
+	ID SERIAL PRIMARY KEY,
+	Description VARCHAR(100) NOT NULL
+);
