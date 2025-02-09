@@ -1,0 +1,48 @@
+CREATE SCHEMA demeterboots;
+
+-- SEQUENCE & FUNCTION FOR AUTO-GENERATED PRIMARY KEYS
+CREATE SEQUENCE demeterboots.customer_seq START 1;
+CREATE SEQUENCE demeterboots.measurement_seq START 1;
+CREATE SEQUENCE demeterboots.employee_seq START 1;
+CREATE SEQUENCE demeterboots.order_seq START 1;
+CREATE SEQUENCE demeterboots.orderline_seq START 1;
+CREATE SEQUENCE demeterboots.repair_seq START 1;
+CREATE SEQUENCE demeterboots.repairline_seq START 1;
+CREATE SEQUENCE demeterboots.invoice_seq START 1;
+CREATE SEQUENCE demeterboots.invoiceline_seq START 1;
+CREATE SEQUENCE demeterboots.job_seq START 1;
+CREATE SEQUENCE demeterboots.jobnotification_seq START 1;
+
+CREATE FUNCTION demeterboots.generate_id(prefix TEXT, seq_name TEXT, is_line_table BOOLEAN) RETURNS TEXT AS $$
+DECLARE
+    new_id TEXT;
+    next_value BIGINT;
+    num_digits INT;
+BEGIN
+    IF is_line_table THEN
+        num_digits := 8;
+    ELSE
+        num_digits := 9;
+    END IF;
+
+    EXECUTE format('SELECT nextval(%L)', seq_name) INTO next_value;
+    new_id := prefix || LPAD(next_value::TEXT, num_digits, '0');
+    RETURN new_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- TRIGGER TO ENFORCE TASKID EXISTS IN ORDER OR REPAIR
+CREATE OR REPLACE FUNCTION demeterboots.enforce_task_existence() RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.TaskType = 'Order' AND NOT EXISTS (SELECT 1 FROM demeterboots.Orders WHERE ID = NEW.TaskID) THEN
+        RAISE EXCEPTION 'Order does not exist';
+    ELSIF NEW.TaskType = 'Repair' AND NOT EXISTS (SELECT 1 FROM demeterboots.Repair WHERE ID = NEW.TaskID) THEN
+        RAISE EXCEPTION 'Repair does not exist';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_task_existence
+BEFORE INSERT ON demeterboots.InvoiceLine
+FOR EACH ROW EXECUTE FUNCTION demeterboots.enforce_task_existence();
