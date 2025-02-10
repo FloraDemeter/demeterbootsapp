@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.passwordHashing;
 
 public class Employee {
 
@@ -21,23 +24,51 @@ public class Employee {
     private String username;
     private String password;
     private Boolean isActive;
-    private Integer AccessLevel;
+    private Integer accessLevel;
     private Date startDate;
     private Date endDate;
 
-
-    private static String detailsFunction  = "SELECT * FROM demeterboots.JobNotification_Details(?)";
-    private static String deleteFunction  = "CALL demeterboots.JobNotification_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.Employee_Details(?, ?)";
+    private static String deleteFunction  = "CALL demeterboots.Employee_Delete(?)";
+    private static String commitFunction  = "CALL demeterboots.Employee_Commit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
 
+//region Contructors
+//--------------------------------------------------------
+    
     public Employee() {
     }
 
-    public Employee(String id) {
-        Details(id);
+    public Employee(String value, boolean isUsername) {
+        Employee employee;
+
+        if (value == null) {
+            return;
+        }
+        
+        if (isUsername) {
+            employee = getEmployeeDetails(value, "");
+        } else {
+            employee = getEmployeeDetails("", value);
+        }
+        if (employee != null) {
+            this.id = employee.id;
+            this.firstName = employee.firstName;
+            this.lastName = employee.lastName;
+            this.street = employee.street;
+            this.postCode = employee.postCode;
+            this.city = employee.city;
+            this.email = employee.email;
+            this.phone = employee.phone;
+            this.username = employee.username;
+            this.password = employee.password;
+            this.isActive = employee.isActive;
+            this.accessLevel = employee.accessLevel;
+            this.startDate = employee.startDate;
+            this.endDate = employee.endDate;
+        }
     }
 
     public Employee(String id, String firstName, String lastName, String street, String postCode, String city, String email, String phone, String username, String password, Boolean isActive, Integer accessLevel, Date startDate, Date endDate) {
@@ -52,38 +83,99 @@ public class Employee {
         this.username = username;
         this.password = password;
         this.isActive = isActive;
-        AccessLevel = accessLevel;
+        this.accessLevel = accessLevel;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public void Details(String id) {
+//--------------------------------------------------------
+//endregion
+
+//region Methods
+//--------------------------------------------------------
+    
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName();
+    }
+
+    public List<Employee> getAllEmployees() {
+        return Details("","");
+    }
+
+    public Employee getEmployeeById(String id) {
+        return new Employee(id, false);
+    }
+
+    public Employee getEmployeeByUserName(String id) {
+        return new Employee(id, true);
+    }
+
+    public Employee getEmployeeDetails(String id, String username) {
+        List<Employee> employees = Details(id, username);
+        if (!employees.isEmpty()) {
+            return employees.get(0);
+        }
+        return null;
+    }
+
+    public Boolean tryLoginUser(String username, String password) {
+        dataContext.currentUser = getEmployeeByUserName(username);
+        if (dataContext.currentUser == null) {
+            return false;
+        }
+        String encryptedPassword = passwordHashing.encryptPassword(password);
+
+        if (!dataContext.currentUser.password.equals(encryptedPassword)) {
+            return false;
+        }
+
+        return true;
+    }
+
+//--------------------------------------------------------
+//endregion
+        
+//region Database methods
+//--------------------------------------------------------
+    
+    public List<Employee> Details(String id, String username) {
+        List<Employee> employees = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
+            stmt.setString(2, username);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.firstName = rs.getString("firstName");
-                    this.lastName = rs.getString("lastName");
-                    this.street = rs.getString("street");
-                    this.postCode = rs.getString("postCode");
-                    this.city = rs.getString("city");
-                    this.email = rs.getString("email");
-                    this.phone = rs.getString("phone");
-                    this.username = rs.getString("username");
-                    this.password = rs.getString("password");
-                    this.isActive = rs.getBoolean("isActive");
-                    AccessLevel = rs.getInt("AccessLevel");
-                    this.startDate = rs.getDate("startDate");
-                    this.endDate = rs.getDate("endDate");
+                while (rs.next()) {
+                    Employee employee = new Employee();
+                    employee.id = rs.getString("id");
+                    employee.firstName = rs.getString("firstName");
+                    employee.lastName = rs.getString("lastName");
+                    employee.street = rs.getString("street");
+                    employee.postCode = rs.getString("postCode");
+                    employee.city = rs.getString("city");
+                    employee.email = rs.getString("email");
+                    employee.phone = rs.getString("phone");
+                    employee.username = rs.getString("username");
+                    employee.password = rs.getString("password");
+                    employee.isActive = rs.getBoolean("isActive");
+                    employee.accessLevel = rs.getInt("AccessLevel");
+                    employee.startDate = rs.getDate("startDate");
+                    employee.endDate = rs.getDate("endDate");
+                    employees.add(employee);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return employees;
     }
 
-    public void Delete(String id) {
+    public void Delete() {
+        if (id == null) {
+            return;
+        }
+
         try (PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
@@ -105,7 +197,7 @@ public class Employee {
             stmt.setString(9, username);
             stmt.setString(10, password);
             stmt.setBoolean(11, isActive);
-            stmt.setInt(12, AccessLevel);
+            stmt.setInt(12, accessLevel);
             stmt.setDate(13, (java.sql.Date) startDate);
             stmt.setDate(14, (java.sql.Date) endDate);
             stmt.execute();
@@ -113,8 +205,13 @@ public class Employee {
             e.printStackTrace();
         }
     }
+//--------------------------------------------------------
+//endregion
+    
 
-    //Getter and Setter methods
+//region Getters and Setters Methods
+//--------------------------------------------------------
+
     public String getEmployeeID() {
         return id;
     }
@@ -204,11 +301,11 @@ public class Employee {
     }
 
     public Integer getAccessLevel() {
-        return AccessLevel;
+        return accessLevel;
     }
 
-    public void setAccessLevel(Integer accessLevel) {
-        AccessLevel = accessLevel;
+    public void setAccessLevel(Integer accessLvl) {
+        accessLevel = accessLvl;
     }
 
     public Date getStartDate() {
@@ -227,3 +324,5 @@ public class Employee {
         this.endDate = endDate;
     }
 }
+//--------------------------------------------------------
+//endregion

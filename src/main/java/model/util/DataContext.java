@@ -1,4 +1,4 @@
-package model;
+package model.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,10 +7,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import model.objects.Employee;
+
 public final class DataContext {
     
     private static DataContext instance;
     private Connection connection;
+
+    public Employee currentUser;
 
     private DataContext() {
         Properties properties = GetProperties();

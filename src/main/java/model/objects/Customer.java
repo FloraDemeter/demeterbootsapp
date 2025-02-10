@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
 
 public class Customer {
     private String id;
@@ -17,19 +19,31 @@ public class Customer {
     private String email;
     private String phone;
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.JobNotification_Details(?)";
-    private static String deleteFunction  = "CALL demeterboots.JobNotification_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?)";
-    private static String notNotifiedFunction  = "CALL demeterboots.JobNotification_NotNotified(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.Customer_Details(?)";
+    private static String deleteFunction  = "CALL demeterboots.Customer_Delete(?)";
+    private static String commitFunction  = "CALL demeterboots.Customer_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+//region Constructors
+//--------------------------------------------------------
 
     public Customer() {
     }
 
     public Customer(String id) {
-        Details(id);
+        Customer customer = getCustomerDetails(id);
+        if (customer != null) {
+            this.id = customer.id;
+            this.firstName = customer.firstName;
+            this.lastName = customer.lastName;
+            this.street = customer.street;
+            this.postCode = customer.postCode;
+            this.city = customer.city;
+            this.email = customer.email;
+            this.phone = customer.phone;
+        }
     }
 
     public Customer(String id, String firstName, String lastName, String street, String postCode, String city, String email, String phone) {
@@ -42,28 +56,68 @@ public class Customer {
         this.email = email;
         this.phone = phone;
     }
+//--------------------------------------------------------
+//endregion
 
-    public void Details(String id) {
+//region Methods
+//--------------------------------------------------------
+
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName();
+    }
+
+    public List<Customer> getAllCustomers() {
+        return Details("");
+    }
+
+    public Customer getCustomer(String id) {
+        return new Customer(id);
+    }
+
+    private Customer getCustomerDetails(String id) {
+        List<Customer> customers = Details(id);
+        if (!customers.isEmpty()) {
+            return customers.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+//region Database methods
+//--------------------------------------------------------
+
+    public List<Customer> Details(String id) {
+        List<Customer> customers = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.firstName = rs.getString("firstName");
-                    this.lastName = rs.getString("lastName");
-                    this.street = rs.getString("street");
-                    this.postCode = rs.getString("postCode");
-                    this.city = rs.getString("city");
-                    this.email = rs.getString("email");
-                    this.phone = rs.getString("phone");
+                while (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.id = rs.getString("p_id");
+                    customer.firstName = rs.getString("firstname");
+                    customer.lastName = rs.getString("lastname");
+                    customer.street = rs.getString("street");
+                    customer.postCode = rs.getString("postcode");
+                    customer.city = rs.getString("city");
+                    customer.email = rs.getString("email");
+                    customer.phone = rs.getString("phonenumber");
+                    customers.add(customer);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return customers;
     }
 
     public void Delete() {
+        if (id == null) {
+            return;
+        }
+
         try(PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
@@ -87,8 +141,13 @@ public class Customer {
             e.printStackTrace();
         }
     }
+//--------------------------------------------------------
+//endregion
+    
 
-    //setter and getter methods
+//region Getters and Setters Methods
+//--------------------------------------------------------
+
     public String getId() {
         return id;
     }
@@ -153,3 +212,5 @@ public class Customer {
         this.phone = phone;
     }
 }
+//--------------------------------------------------------
+//endregion
