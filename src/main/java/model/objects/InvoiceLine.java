@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.InvoiceLineException;
 
 public class InvoiceLine {
     private String id;
@@ -14,18 +17,36 @@ public class InvoiceLine {
     private String taskType;
     private Double total;
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.InvoiceLine_Details(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.InvoiceLine_Details(?, ?)";
     private static String deleteFunction  = "CALL demeterboots.InvoiceLine_Delete(?)";
     private static String commitFunction  = "CALL demeterboots.InvoiceLine_Commit(?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+
+//region Constructors
+//--------------------------------------------------------
 
     public InvoiceLine() {
     }
 
-    public InvoiceLine(String id) {
-        Details(id);
+    public InvoiceLine(String id) throws InvoiceLineException {
+        InvoiceLine invoiceline;
+
+        if (id == null) {
+            return;
+        }
+
+        invoiceline = getInvoiceLineDetails(id);
+
+        if (invoiceline != null) {
+            this.id = invoiceline.id;
+            this.invoiceID = invoiceline.invoiceID;
+            this.taskID = invoiceline.taskID;
+            this.taskType = invoiceline.taskType;
+            this.total = invoiceline.total;
+        }
     }
 
     public InvoiceLine(String id, String invoiceID, String taskID, String taskType, Double total) {
@@ -36,33 +57,74 @@ public class InvoiceLine {
         this.total = total;
     }
 
-    public void Details(String id) {
+//--------------------------------------------------------
+//endregion
+
+//region Methods
+//--------------------------------------------------------
+
+    public List<InvoiceLine> getAllInvoiceLines() throws InvoiceLineException {
+        return Details("", "");
+    }
+
+    public List<InvoiceLine> getAllInvoiceLinesByInvoiceID(String invoiceID) throws InvoiceLineException {
+        return Details("", invoiceID);
+    }
+
+    public final InvoiceLine getInvoiceLineDetails(String id) throws InvoiceLineException {
+        List<InvoiceLine> invoiceLines = Details(id, "");
+        if (!invoiceLines.isEmpty()) {
+            return invoiceLines.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+
+//region Database Methods
+//--------------------------------------------------------
+
+    public List<InvoiceLine> Details(String invoiceLineId, String invoiceId) throws InvoiceLineException {
+        List<InvoiceLine> invoiceLines = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
+            stmt.setString(1, invoiceLineId);
+            stmt.setString(2, invoiceId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.invoiceID = rs.getString("invoiceID");
-                    this.taskID = rs.getString("taskID");
-                    this.taskType = rs.getString("taskType");
-                    this.total = rs.getDouble("total");
+                while (rs.next()) {
+                    InvoiceLine invoiceLine = new InvoiceLine();
+                    invoiceLine.id = rs.getString("id");
+                    invoiceLine.invoiceID = rs.getString("invoiceID");
+                    invoiceLine.taskID = rs.getString("taskID");
+                    invoiceLine.taskType = rs.getString("taskType");
+                    invoiceLine.total = rs.getDouble("total");
+                    invoiceLines.add(invoiceLine);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (invoiceLineId != null) {
+                throw new InvoiceLineException(String.format("Error getting invoice line details by Invoice Line ID %s", invoiceLineId), e);
+            } if ( invoiceId != null) {
+                throw new InvoiceLineException(String.format("Error getting invoice line details by Invoice ID %s", invoiceId), e);
+            }
+
+            throw new InvoiceLineException("Error getting all invoice lines", e);
         }
+
+        return invoiceLines;
     }
 
-    public void Delete() {
+    public void Delete() throws InvoiceLineException {
         try(PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new InvoiceLineException(String.format("Error deleting invoice line with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws InvoiceLineException {
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, invoiceID);
@@ -71,11 +133,15 @@ public class InvoiceLine {
             stmt.setDouble(5, total);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new InvoiceLineException(String.format("Error committing invoice line with ID %s", id), e);
         }
     }
 
-    // Getters and Setters
+//--------------------------------------------------------
+//endregion
+
+//region Getters and Setters
+//--------------------------------------------------------
 
     public String getId() {
         return id;
@@ -117,3 +183,5 @@ public class InvoiceLine {
         this.total = total;
     }
 }
+//--------------------------------------------------------
+//endregion

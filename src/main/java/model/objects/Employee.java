@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.util.DataContext;
+import model.util.exceptions.EmployeeException;
 import model.util.passwordHashing;
 
 public class Employee {
@@ -32,7 +33,7 @@ public class Employee {
     private static String deleteFunction  = "CALL demeterboots.Employee_Delete(?)";
     private static String commitFunction  = "CALL demeterboots.Employee_Commit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private static final DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
 
 //region Contructors
@@ -41,7 +42,7 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String value, boolean isUsername) {
+    public Employee(String value, boolean isUsername) throws EmployeeException {
         Employee employee;
 
         if (value == null) {
@@ -99,19 +100,19 @@ public class Employee {
         return getFirstName() + " " + getLastName();
     }
 
-    public List<Employee> getAllEmployees() {
+    public List<Employee> getAllEmployees() throws EmployeeException {
         return Details("","");
     }
 
-    public Employee getEmployeeById(String id) {
+    public Employee getEmployeeById(String id) throws EmployeeException {
         return new Employee(id, false);
     }
 
-    public Employee getEmployeeByUserName(String id) {
-        return new Employee(id, true);
+    public Employee getEmployeeByUserName(String username) throws EmployeeException {
+        return new Employee(username, true);
     }
 
-    public Employee getEmployeeDetails(String id, String username) {
+    public final Employee getEmployeeDetails(String id, String username) throws EmployeeException {
         List<Employee> employees = Details(id, username);
         if (!employees.isEmpty()) {
             return employees.get(0);
@@ -119,18 +120,14 @@ public class Employee {
         return null;
     }
 
-    public Boolean tryLoginUser(String username, String password) {
+    public Boolean tryLoginUser(String username, String password) throws EmployeeException {
         dataContext.currentUser = getEmployeeByUserName(username);
         if (dataContext.currentUser == null) {
             return false;
         }
         String encryptedPassword = passwordHashing.encryptPassword(password);
 
-        if (!dataContext.currentUser.password.equals(encryptedPassword)) {
-            return false;
-        }
-
-        return true;
+        return dataContext.currentUser.password.equals(encryptedPassword);
     }
 
 //--------------------------------------------------------
@@ -139,7 +136,7 @@ public class Employee {
 //region Database methods
 //--------------------------------------------------------
     
-    public List<Employee> Details(String id, String username) {
+    public List<Employee> Details(String id, String username) throws EmployeeException {
         List<Employee> employees = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
@@ -165,13 +162,21 @@ public class Employee {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new EmployeeException(String.format("Error fetching employee details with Employee ID %s", id ), e);
+            }
+
+            if (username != null) {
+                throw new EmployeeException(String.format("Error fetching employee details with Employee Username %s", username ), e);
+            }
+
+            throw new EmployeeException("Error fetching employee details", e);
         }
 
         return employees;
     }
 
-    public void Delete() {
+    public void Delete() throws EmployeeException {
         if (id == null) {
             return;
         }
@@ -180,11 +185,11 @@ public class Employee {
             stmt.setString(1, id);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new EmployeeException(String.format("Error deleting employee with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws EmployeeException {
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, firstName);
@@ -202,7 +207,7 @@ public class Employee {
             stmt.setDate(14, (java.sql.Date) endDate);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new EmployeeException(String.format("Error committing employee details for user %s", id), e);
         }
     }
 //--------------------------------------------------------

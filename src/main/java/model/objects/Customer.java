@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.util.DataContext;
+import model.util.exceptions.CustomerException;
 
 public class Customer {
     private String id;
@@ -23,7 +24,7 @@ public class Customer {
     private static String deleteFunction  = "CALL demeterboots.Customer_Delete(?)";
     private static String commitFunction  = "CALL demeterboots.Customer_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
 
 //region Constructors
@@ -32,7 +33,7 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(String id) {
+    public Customer(String id) throws CustomerException{
         Customer customer = getCustomerDetails(id);
         if (customer != null) {
             this.id = customer.id;
@@ -67,15 +68,15 @@ public class Customer {
         return getFirstName() + " " + getLastName();
     }
 
-    public List<Customer> getAllCustomers() {
+    public List<Customer> getAllCustomers() throws CustomerException {
         return Details("");
     }
 
-    public Customer getCustomer(String id) {
+    public Customer getCustomer(String id) throws CustomerException {
         return new Customer(id);
     }
 
-    private Customer getCustomerDetails(String id) {
+    private Customer getCustomerDetails(String id) throws CustomerException {
         List<Customer> customers = Details(id);
         if (!customers.isEmpty()) {
             return customers.get(0);
@@ -89,7 +90,7 @@ public class Customer {
 //region Database methods
 //--------------------------------------------------------
 
-    public List<Customer> Details(String id) {
+    public List<Customer> Details(String id) throws CustomerException {
         List<Customer> customers = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
@@ -108,12 +109,16 @@ public class Customer {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id.isEmpty()) {
+                throw new CustomerException("Error getting all customers", e);
+            } else {
+                throw new CustomerException(String.format("Error getting customer with ID %s", id), e);
+            }
         }
         return customers;
     }
 
-    public void Delete() {
+    public void Delete() throws CustomerException {
         if (id == null) {
             return;
         }
@@ -122,11 +127,11 @@ public class Customer {
             stmt.setString(1, id);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new CustomerException(String.format("Error deleting customer with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws CustomerException {
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, firstName);
@@ -138,7 +143,7 @@ public class Customer {
             stmt.setString(8, phone);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new CustomerException(String.format("Error committing customer with ID %s", id), e);
         }
     }
 //--------------------------------------------------------
