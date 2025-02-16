@@ -4,141 +4,219 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.JobNotificationException;
 
 public class JobNotification {
     private String id;
-    private String jobTitle;
-    private String jobDescription;
-    private LocalDateTime notificationTime;
-    private boolean isRead;
+    private String previousEmployeeID;
+    private String newEmployeeID;
+    private Boolean isNotified;
+    private String taskID;
+    private String taskType;
 
     private static String detailsFunction  = "SELECT * FROM demeterboots.JobNotification_Details(?)";
     private static String deleteFunction  = "CALL demeterboots.JobNotification_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?)";
+    private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?, ?)";
     private static String notNotifiedFunction  = "CALL demeterboots.JobNotification_NotNotified(?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+//region Constructors
+//--------------------------------------------------------
 
     public JobNotification() {
     }
 
-    public JobNotification(String id) {
-        Details(id);
+    public JobNotification(String id) throws JobNotificationException {
+        JobNotification jobNotification;
+
+        if (id == null) {
+            return;
+        }
+
+        jobNotification = getJobNotificationDetails(id);
+
+        if (jobNotification != null) {
+            this.id = jobNotification.id;
+            this.previousEmployeeID = jobNotification.previousEmployeeID;
+            this.newEmployeeID = jobNotification.newEmployeeID;
+            this.isNotified = jobNotification.isNotified;
+            this.taskID = jobNotification.taskID;
+            this.taskType = jobNotification.taskType;
+        }
     }
 
-    public JobNotification(String id, String jobTitle, String jobDescription, LocalDateTime notificationTime, boolean isRead) {
+    public JobNotification(String id, String previousEmployeeID, String newEmployeeID, Boolean isNotified, String taskID, String taskType) {
         this.id = id;
-        this.jobTitle = jobTitle;
-        this.jobDescription = jobDescription;
-        this.notificationTime = notificationTime;
-        this.isRead = isRead;
+        this.previousEmployeeID = previousEmployeeID;
+        this.newEmployeeID = newEmployeeID;
+        this.isNotified = isNotified;
+        this.taskID = taskID;
+        this.taskType = taskType;
     }
 
-    public void Details(String id) {
-        
+//--------------------------------------------------------
+//endregion
+    
+//region Methods
+//--------------------------------------------------------
+
+    public List<JobNotification> getAllJobNotifications() throws JobNotificationException {
+        return Details("");
+    }
+
+    public List<JobNotification> getUnnotifiedJobs(String employeeID) throws JobNotificationException {
+        return NotNotified(employeeID);
+    }
+
+    public final JobNotification getJobNotificationDetails(String id) throws JobNotificationException {
+        List<JobNotification> jobNotifications = Details(id);
+        if (!jobNotifications.isEmpty()) {
+            return jobNotifications.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+
+//region Database methods
+//--------------------------------------------------------
+
+    public final List<JobNotification> Details(String id) throws JobNotificationException{
+        List<JobNotification> jobNotifs = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.jobTitle = rs.getString("jobTitle");
-                    this.jobDescription = rs.getString("jobDescription");
-                    this.notificationTime = rs.getTimestamp("notificationTime").toLocalDateTime();
-                    this.isRead = rs.getBoolean("isRead");
+                while (rs.next()) {
+                    JobNotification jobNotif = new JobNotification();
+                    jobNotif.id = rs.getString("id");
+                    jobNotif.previousEmployeeID = rs.getString("previousEmployeeID");
+                    jobNotif.newEmployeeID = rs.getString("newEmployeeID");
+                    jobNotif.isNotified = rs.getBoolean("isNotified");
+                    jobNotif.taskID = rs.getString("taskID");
+                    jobNotif.taskType = rs.getString("taskType");
+                    jobNotifs.add(jobNotif);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new JobNotificationException(String.format("Error fetching Job Notification with ID %s", id), e);
+            }
+            throw new JobNotificationException("Error fetching Job Notifications", e);
         }
+        return jobNotifs;
     }
 
-    public void Commit () {
+    public void Commit () throws JobNotificationException{
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
-            stmt.setString(1, this.id);
-            stmt.setString(2, this.jobTitle);
-            stmt.setString(3, this.jobDescription);
-            stmt.setObject(4, this.notificationTime);
-            stmt.setBoolean(5, this.isRead);
+            stmt.setString(1, id);
+            stmt.setString(2, previousEmployeeID);
+            stmt.setString(3, newEmployeeID);
+            stmt.setBoolean(4, isNotified);
+            stmt.setString(5, taskID);
+            stmt.setString(6, taskType);
             stmt.execute();
         }catch (SQLException e) {
-            e.printStackTrace();
+            throw new JobNotificationException(String.format("Error committing Job Notification with ID %s", id), e);
         }
     }
 
-    public void Delete () {
+    public void Delete () throws JobNotificationException{
+        if (id == null) {
+            return;
+        }
+
         try (PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, this.id);
             stmt.execute();
         }catch (SQLException e) {
-            e.printStackTrace();
+           throw new JobNotificationException(String.format("Error deleting Job Notification with ID %s", id), e);
         }
     }
 
-    public List<JobNotification> NotNotified(int employeeId) {
+    public List<JobNotification> NotNotified(String employeeId) throws JobNotificationException {
         List<JobNotification> jobNotifications = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(notNotifiedFunction)) {
-            stmt.setInt(1, employeeId);
+            stmt.setString(1, employeeId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    jobNotifications.add(new JobNotification(
-                        rs.getString("id"),
-                        rs.getString("jobTitle"),
-                        rs.getString("jobDescription"),
-                        rs.getTimestamp("notificationTime").toLocalDateTime(),
-                        rs.getBoolean("isRead")
-                    ));
+                    JobNotification jobNotif = new JobNotification();
+                    jobNotif.id = rs.getString("id");
+                    jobNotif.previousEmployeeID = rs.getString("previousEmployeeID");
+                    jobNotif.newEmployeeID = rs.getString("newEmployeeID");
+                    jobNotif.isNotified = rs.getBoolean("isNotified");
+                    jobNotif.taskID = rs.getString("taskID");
+                    jobNotif.taskType = rs.getString("taskType");
+                    jobNotifications.add(jobNotif);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+           throw new JobNotificationException(String.format("Error fetching Job Notifications for Employee with ID %s", employeeId), e);
         }
         return jobNotifications;
     }
 
-    // Getters and Setters
-    public String getId() {
+//--------------------------------------------------------
+//endregion
+
+//region Getters and Setters
+//--------------------------------------------------------
+
+    public String getID() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setID(String id) {
         this.id = id;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
+    public String getPreviousEmployeeID() {
+        return previousEmployeeID;
     }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
+    public void setPreviousEmployeeID(String previousEmployeID) {
+        this.previousEmployeeID = previousEmployeID;
     }
 
-    public String getJobDescription() {
-        return jobDescription;
+    public String getNewEmployeeID() {
+        return newEmployeeID;
     }
 
-    public void setJobDescription(String jobDescription) {
-        this.jobDescription = jobDescription;
+    public void setNewEmployeeID(String newEmployeeID) {
+        this.newEmployeeID = newEmployeeID;
     }
 
-    public LocalDateTime getNotificationTime() {
-        return notificationTime;
+    public Boolean getIsNotified() {
+        return isNotified;
     }
 
-    public void setNotificationTime(LocalDateTime notificationTime) {
-        this.notificationTime = notificationTime;
+    public void setIsNotified(Boolean isNotified) {
+        this.isNotified = isNotified;
     }
 
-    public boolean isRead() {
-        return isRead;
+    public String getTaskID() {
+        return taskID;
     }
 
-    public void setRead(boolean isRead) {
-        this.isRead = isRead;
+    public void setTaskID(String taskID) {
+        this.taskID = taskID;
     }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
+    }
+
 }
+//--------------------------------------------------------
+//endregion

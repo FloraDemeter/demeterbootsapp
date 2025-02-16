@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.RepairLineException;
 
 public class RepairLine {
     private String id;
@@ -15,18 +18,36 @@ public class RepairLine {
     private Double price;
     private String notes; 
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.RepairLine_Details(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.RepairLine_Details(?, ?)";
     private static String deleteFunction  = "CALL demeterboots.RepairLine_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.RepairLine_Commit(?, ?, ?, ?, ?)";
+    private static String commitFunction  = "CALL demeterboots.RepairLine_Commit(?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
 
+//region Constructors
+//--------------------------------------------------------
+   
     public RepairLine() {
     }
 
-    public RepairLine(String id) {
-        Details(id);
+    public RepairLine(String id) throws RepairLineException {
+        RepairLine repairline;
+
+        if (id == null) {
+            return;
+        }
+
+        repairline = getRepairLineDetails(id);
+
+        if (repairline != null) {
+            this.id = repairline.id;
+            this.repairID = repairline.repairID;
+            this.productTypeID = repairline.productTypeID;
+            this.repairCategoryID = repairline.repairCategoryID;
+            this.price = repairline.price;
+            this.notes = repairline.notes;
+        }
     }
 
     public RepairLine(String id, String repairID, Integer productTypeID, Integer repairCategoryID, Double price, String notes) {
@@ -37,35 +58,75 @@ public class RepairLine {
         this.price = price;
         this.notes = notes;
     }
+//--------------------------------------------------------
+//endregion
 
-    public void Details(String id) {
+//region Methods
+//--------------------------------------------------------
+
+    public List<RepairLine> getAllRepairLines() throws RepairLineException {
+        return Details("", "");
+    }
+
+    public List<RepairLine> getAllRepairLinesForRepair(String repairId) throws RepairLineException {
+        return Details("", repairID);
+    }
+
+    public final RepairLine getRepairLineDetails(String id) throws RepairLineException {
+        List<RepairLine> repairLines = Details(id, "");
+        if (!repairLines.isEmpty()) {
+            return repairLines.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+//region Database methods
+//--------------------------------------------------------
+
+    public List<RepairLine> Details(String id, String repairID) throws RepairLineException{
+        List<RepairLine> repairLines = new ArrayList<>();
         try {PreparedStatement statement = connection.prepareStatement(detailsFunction);
             statement.setString(1, id);
+            statement.setString(2, repairID);
             try(ResultSet reader = statement.executeQuery()) {
-                if (reader.next()) {
+                while (reader.next()) {
+                    RepairLine repairline = new RepairLine();
                     this.id = reader.getString("id");
                     this.repairID = reader.getString("repairID");
                     this.productTypeID = reader.getInt("productTypeID");
                     this.repairCategoryID = reader.getInt("repairCategoryID");
                     this.price = reader.getDouble("price");
                     this.notes = reader.getString("notes");
+                    repairLines.add(repairline);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new RepairLineException(String.format("Error fetching repair line details with ID %s", id), e);
+            }
+
+            if (repairID != null) {
+                throw new RepairLineException(String.format("Error fetching repair line details with Repair ID %s",repairID), e);
+            }
+            throw new RepairLineException("Error fetching repair line details", e);
         }
+
+        return repairLines;
     }
 
-    public void Delete() {
+    public void Delete() throws RepairLineException {
         try {PreparedStatement statement = connection.prepareStatement(deleteFunction);
             statement.setString(1, id);
             statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RepairLineException(String.format("Error deleting repair line with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws RepairLineException{
         try {PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setString(1, id);
             statement.setString(2, repairID);
@@ -75,11 +136,18 @@ public class RepairLine {
             statement.setString(6, notes);
             statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null ) {
+                throw new RepairLineException(String.format("Error while updating repair line with ID %s", id), e);    
+            }
+            throw new RepairLineException("Error while committing repair line", e);
         }
     }
+//--------------------------------------------------------
+//endregion
 
-    // Getters and Setters
+//region Getters and setters
+//--------------------------------------------------------
+
     public String getId() {
         return id;
     }
@@ -127,6 +195,7 @@ public class RepairLine {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
+//--------------------------------------------------------
+//endregion
 
 }

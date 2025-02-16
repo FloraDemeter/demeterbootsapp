@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.LeatherException;
 
 public class Leather {
 
@@ -15,19 +18,35 @@ public class Leather {
     private String imagePath;
     private Boolean isAvailable;
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.JobNotification_Details(?)";
-    private static String deleteFunction  = "CALL demeterboots.JobNotification_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?)";
-    private static String notNotifiedFunction  = "CALL demeterboots.JobNotification_NotNotified(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.Leather_Details(?, ?)";
+    private static String deleteFunction  = "CALL demeterboots.Leather_Delete(?)";
+    private static String commitFunction  = "CALL demeterboots.Leather_Commit(?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
 
+//region Constructors
+//--------------------------------------------------------
+    
     public Leather() {
     }
 
-    public Leather(Integer id) {
-        Details(id);
+    public Leather(Integer id) throws LeatherException{
+        Leather leather;
+        
+        if (id <= 0) {
+            return;
+        }
+
+        leather = getLeatherDetails(id);
+
+        if (leather != null) {
+            this.id = leather.id;
+            this.colour = leather.colour;
+            this.description = leather.description;
+            this.imagePath = leather.imagePath;
+            this.isAvailable = leather.isAvailable;
+        }
     }
 
     public Leather(Integer id, String colour, String description, String imagePath, Boolean isAvailable) {
@@ -38,33 +57,68 @@ public class Leather {
         this.isAvailable = isAvailable;
     }
 
-    public void Details(Integer id) {
+//--------------------------------------------------------
+//endregion
+
+//region Methods
+//--------------------------------------------------------
+
+    public List<Leather> getAllLeathers() throws LeatherException {
+        return Details(null);
+    }
+
+    public final Leather getLeatherDetails(Integer id) throws LeatherException {
+        List<Leather> leathers = Details(id);
+        if (!leathers.isEmpty()) {
+            return leathers.get(0);
+        }
+
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+
+//region Database Methods
+//--------------------------------------------------------
+    
+    public final List<Leather> Details(Integer id) throws LeatherException {
+        List<Leather> leathers = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
             statement.setInt(1, id);
             try(ResultSet resultSet = statement.executeQuery()) {
-                if(resultSet.next()) {
-                    this.id = resultSet.getInt("id");
-                    this.colour = resultSet.getString("colour");
-                    this.description = resultSet.getString("description");
-                    this.imagePath = resultSet.getString("imagePath");
-                    this.isAvailable = resultSet.getBoolean("isAvailable");
+                while (resultSet.next()) {
+                    Leather leather = new Leather();
+                    leather.id = resultSet.getInt("id");
+                    leather.colour = resultSet.getString("colour");
+                    leather.description = resultSet.getString("description");
+                    leather.imagePath = resultSet.getString("imagePath");
+                    leather.isAvailable = resultSet.getBoolean("isAvailable");
+                    leathers.add(leather);
                 }
             }
         }catch(SQLException e) {
-            e.printStackTrace();
+            
+            if (id != null) {
+                throw new LeatherException(String.format("Error getting leather details for ID %s", id), e);
+            }
+            throw new LeatherException("Error getting leather details", e);
         }
+
+        return leathers;
     }
 
-    public void Delete() {
+    public void Delete() throws LeatherException{
         try(PreparedStatement statement = connection.prepareStatement(deleteFunction)) {
             statement.setInt(1, id);
             statement.execute();
         }catch(SQLException e) {
-            e.printStackTrace();
+            throw new LeatherException(String.format("Error deleting leather details with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws LeatherException{
         try(PreparedStatement statement = connection.prepareStatement(commitFunction)) {
             statement.setInt(1, id);
             statement.setString(2, colour);
@@ -73,11 +127,16 @@ public class Leather {
             statement.setBoolean(5, isAvailable);
             statement.execute();
         }catch(SQLException e) {
-            e.printStackTrace();
+            throw new LeatherException(String.format("Error committing leather details with ID %s", id), e);
         }
     }
 
-    //setters and getters
+//--------------------------------------------------------
+//endregion
+
+//region Getters and Setters
+//--------------------------------------------------------
+
     public Integer getId() {
         return id;
     }
@@ -118,3 +177,5 @@ public class Leather {
         this.isAvailable = isAvailable;
     }
 }
+//--------------------------------------------------------
+//endregion

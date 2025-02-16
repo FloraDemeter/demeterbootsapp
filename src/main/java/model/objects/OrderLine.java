@@ -5,8 +5,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.OrderLineException;;
 
 public class OrderLine {
 
@@ -18,18 +21,37 @@ public class OrderLine {
     private Double price;
     private String notes;
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.OrderLine_Details(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.OrderLine_Details(?, ?)";
     private static String deleteFunction  = "CALL demeterboots.OrderLine_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.OrderLine_Commit(?, ?, ?, ?, ?)";
+    private static String commitFunction  = "CALL demeterboots.OrderLine_Commit(?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+//region Constructors
+//--------------------------------------------------------
 
     public OrderLine() {
     }
 
-    public OrderLine(String id) {
-        Details(id);
+    public OrderLine(String id) throws OrderLineException{
+        OrderLine line;
+
+        if (id == null) {
+            return;
+        }
+
+        line = getOrderLineDetails(id);
+        
+        if (line != null) {
+            this.id = line.id;
+            this.orderId = line.orderId;
+            this.productTypeID = line.productTypeID;
+            this.leatherID = line.leatherID;
+            this.productStyle = line.productStyle;
+            this.price = line.price;
+            this.notes = line.notes;
+        }
     }
 
     public OrderLine(String id, String orderId, Integer productTypeID, Integer leatherID, String productStyle, Double price, String notes) {
@@ -42,35 +64,78 @@ public class OrderLine {
         this.notes = notes;
     }
 
-    public void Details(String id) {
+//--------------------------------------------------------
+//endregion
+
+//region Methods
+//--------------------------------------------------------
+
+    public List<OrderLine> getAllOrderLines() throws OrderLineException {
+        return Details("","");
+    }
+
+    public List<OrderLine> getAllOrderLinesPerOrder(String orderId) throws OrderLineException {
+        return Details("", orderId);
+    }
+
+    public final OrderLine getOrderLineDetails(String id) throws OrderLineException {
+        List<OrderLine> lines = Details(id, "");
+        if (!lines.isEmpty()) {
+            return lines.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+//region Database Methods
+//--------------------------------------------------------
+
+    public List<OrderLine> Details(String id, String orderID) throws OrderLineException {
+        List<OrderLine> lines = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.orderId = rs.getString("orderId");
-                    this.productTypeID = rs.getInt("productTypeID");
-                    this.leatherID = rs.getInt("leatherID");
-                    this.productStyle = rs.getString("productStyle");
-                    this.price = rs.getDouble("price");
-                    this.notes = rs.getString("notes");
+                while (rs.next()) {
+                    OrderLine line = new OrderLine();
+                    line.id = rs.getString("id");
+                    line.orderId = rs.getString("orderId");
+                    line.productTypeID = rs.getInt("productTypeID");
+                    line.leatherID = rs.getInt("leatherID");
+                    line.productStyle = rs.getString("productStyle");
+                    line.price = rs.getDouble("price");
+                    line.notes = rs.getString("notes");
+                    lines.add(line);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new OrderLineException(String.format("Error fetching order line details with ID %s", id), e);
+            }
+            if (orderID != null) {
+                throw new OrderLineException(String.format("Error fetching order line details with Order ID %s", orderID), e);
+            }
+            throw new OrderLineException("Error fetching order line details", e);
         }
+
+        return lines;
     }
 
-    public void Delete() {
+    public void Delete() throws OrderLineException {
+        if (id == null) {
+            return;
+        }
+
         try (CallableStatement stmt = connection.prepareCall(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new OrderLineException(String.format("Error deleting order line with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws OrderLineException {
         try (CallableStatement stmt = connection.prepareCall(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, orderId);
@@ -81,13 +146,19 @@ public class OrderLine {
             stmt.setString(7, notes);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new OrderLineException(String.format("Error updating order line with ID %s", id), e);
+            }
+            throw new OrderLineException("Error commiting order line", e);
         }
     }
 
-    //format the json object properly
+//--------------------------------------------------------
+//endregion
 
-    //setters and getters
+//region Getters and setters
+//--------------------------------------------------------
+
     public String getId() {
         return id;
     }
@@ -143,4 +214,7 @@ public class OrderLine {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+//--------------------------------------------------------
+//endregion
+
 }

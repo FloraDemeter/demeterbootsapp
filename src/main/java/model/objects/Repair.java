@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.RepairException;
 
 public class Repair {
 
@@ -19,18 +22,38 @@ public class Repair {
     private Boolean isWarrantyAccepted;
     private Integer status;
 
-    private static String detailsFunction  = "SELECT * FROM demeterboots.Repair_Details(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.Repair_Details(?, ?)";
     private static String deleteFunction  = "CALL demeterboots.Repair_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.Repair_Commit(?, ?, ?, ?, ?)";
+    private static String commitFunction  = "CALL demeterboots.Repair_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+//region Constructors
+//--------------------------------------------------------
 
     public Repair() {
     }
 
-    public Repair(String id) {
-        Details(id);
+    public Repair(String id) throws RepairException {
+        Repair repair;
+
+        if (id == null) {
+            return;
+        }
+
+        repair = getRepairDetails(id);
+
+        if (repair != null) {
+            this.id = repair.id;
+            this.customerID = repair.customerID;
+            this.repairDate = repair.repairDate;
+            this.predictedDate = repair.predictedDate;
+            this.location = repair.location;
+            this.total = repair.total;
+            this.isWarrantyAccepted = repair.isWarrantyAccepted;
+            this.status = repair.status;
+        }
     }
 
     public Repair(String id, String customerID, Date repairDate, Date predictedDate, String location, Double total, Boolean isWarrantyAccepted, Integer status) {
@@ -43,37 +66,82 @@ public class Repair {
         this.isWarrantyAccepted = isWarrantyAccepted;
         this.status = status;
     }
+//--------------------------------------------------------
+//endregion
 
-    public void Details(String id) {
+//region Methods
+//--------------------------------------------------------
+
+    public List<Repair> getAllRepairs() throws RepairException {
+        return Details("","");
+    }
+
+    public List<Repair> getAllRepairsForCustomer(String customerID) throws RepairException {
+        return Details("", customerID);
+    }
+
+    public final Repair getRepairDetails(String id) throws RepairException {
+        List<Repair> repairs = Details(id, "");
+        if (!repairs.isEmpty()) {
+            return repairs.get(0);
+        }
+
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+//region Database methods
+//--------------------------------------------------------
+
+    public final List<Repair> Details(String id, String customerID) throws RepairException {
+        List<Repair> repairs = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    this.id = rs.getString("id");
-                    this.customerID = rs.getString("customerID");
-                    this.repairDate = rs.getDate("repairDate");
-                    this.predictedDate = rs.getDate("predictedDate");
-                    this.location = rs.getString("location");
-                    this.total = rs.getDouble("total");
-                    this.isWarrantyAccepted = rs.getBoolean("isWarrantyAccepted");
-                    this.status = rs.getInt("status");
+                while (rs.next()) {
+                    Repair repair = new Repair();
+                    repair.id = rs.getString("id");
+                    repair.customerID = rs.getString("customerID");
+                    repair.repairDate = rs.getDate("repairDate");
+                    repair.predictedDate = rs.getDate("predictedDate");
+                    repair.location = rs.getString("location");
+                    repair.total = rs.getDouble("total");
+                    repair.isWarrantyAccepted = rs.getBoolean("isWarrantyAccepted");
+                    repair.status = rs.getInt("status");
+                    repairs.add(repair);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+           if (id != null) {
+                throw new RepairException(String.format("Error fetching repair details for order with ID %s", id), e);
+           }
+
+           if (customerID != null) {
+                throw new RepairException(String.format("Error fetching repair details for customer %s", customerID), e);
+           }
+
+           throw new RepairException(String.format("Error fetching repair details"), e);
         }
+
+        return repairs;
     }
 
-    public void Delete() {
+    public void Delete() throws RepairException {
+        if (id == null) {
+            return;
+        }
+
         try (PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RepairException(String.format("Error deleting repair with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws RepairException {
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, customerID);
@@ -85,11 +153,15 @@ public class Repair {
             stmt.setInt(8, status);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RepairException(String.format("Error updating repair with ID %s", id), e);
         }
     }
+//--------------------------------------------------------
+//endregion
 
-    //setters and getters
+//region Getters and Setters
+//--------------------------------------------------------
+
     public String getId() {
         return id;
     }
@@ -134,8 +206,8 @@ public class Repair {
         return total;
     }
 
-    public void setTotal(Double total) {
-        total = total;
+    public void setTotal(Double newTotal) {
+        total = newTotal;
     }
 
     public Boolean getIsWarrantyAccepted() {
@@ -150,7 +222,10 @@ public class Repair {
         return status;
     }
 
-    public void setStatus(Integer status) {
-        status = status;
+    public void setStatus(Integer newStatus) {
+        status = newStatus;
     }
 }
+
+//--------------------------------------------------------
+//endregion

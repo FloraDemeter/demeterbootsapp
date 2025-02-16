@@ -1,9 +1,15 @@
 package model.objects;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import model.DataContext;
+import model.util.DataContext;
+import model.util.exceptions.OrderException;
 
 public class Order {
 
@@ -20,14 +26,34 @@ public class Order {
     private static String deleteFunction  = "CALL demeterboots.Order_Delete(?)";
     private static String commitFunction  = "CALL demeterboots.Order_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static DataContext dataContext = DataContext.getInstance();
+    private final static DataContext dataContext = DataContext.getInstance();
     private static Connection connection = dataContext.getConnection();
+
+//region Constructors
+//--------------------------------------------------------
 
     public Order() {
     }
 
-    public Order(String id) {
-        Details(id);
+    public Order(String id) throws OrderException {
+        Order order;
+
+        if (id == null) {
+            return;
+    }
+
+        order = getOrderDetails(id);
+
+        if (order != null) {
+            this.id = order.id;
+            this.customerID = order.id;
+            this.orderDate = order.orderDate;
+            this.predictedFinishDate = order.predictedFinishDate;
+            this.location = order.location;
+            this.total = order.total;
+            this.isWarrantyAccepted = order.isWarrantyAccepted;
+            this.status = order.status;
+        }
     }
 
     public Order(String id, String customerID, Date orderDate, Date predictedFinishDate, String location, double total, String isWarrantyAccepted, String status) {
@@ -41,12 +67,42 @@ public class Order {
         this.status = status;
     }
 
-    public void Details(String id) {
+//--------------------------------------------------------
+//endregion
 
+//region Methods
+//--------------------------------------------------------
+
+    public List<Order> getAllOrders() throws OrderException {
+        return Details("","");
+    }
+
+    public List<Order> getAllOrdersForCustomer(String customerID) throws OrderException {
+        return Details("", customerID);
+    }
+
+    public final Order getOrderDetails(String id) throws OrderException {
+        List<Order> orders = Details(id,"");
+        if (!orders.isEmpty()) {
+            return orders.get(0);
+        }
+        return null;
+    }
+
+//--------------------------------------------------------
+//endregion
+
+//region Database methods
+//--------------------------------------------------------
+
+    public List<Order> Details(String id, String customerID) throws OrderException{
+        List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id);
+            stmt.setString(2, customerID);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
+                    Order order = new Order();
                     this.id = rs.getString("id");
                     this.customerID = rs.getString("customerID");
                     this.orderDate = rs.getDate("orderDate");
@@ -55,23 +111,35 @@ public class Order {
                     this.total = rs.getDouble("total");
                     this.isWarrantyAccepted = rs.getString("isWarrantyAccepted");
                     this.status = rs.getString("status");
+                    orders.add(order);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (id != null) {
+                throw new OrderException(String.format("Error fetching order details for ID %s", id), e);
+            }
+            if (customerID != null) {
+                throw new OrderException(String.format("Error fetching order details for customer %s", customerID), e);
+            }
+            throw new OrderException("Error fetching order details", e);
         }
+        return orders;
     }
 
-    public void Delete() {
+    public void Delete() throws OrderException {
+        if (id == null) {
+            return;
+        }
+
         try (PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new OrderException(String.format("Error deleted order with ID %s", id), e);
         }
     }
 
-    public void Commit() {
+    public void Commit() throws OrderException{
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, this.id);
             stmt.setString(2, this.customerID);
@@ -83,11 +151,15 @@ public class Order {
             stmt.setString(8, this.status);
             stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new OrderException(String.format("Error updating order with ID %s", id), e);
         }
     }
+//--------------------------------------------------------
+//endregion
 
-    //Getter and Setter methods
+//region Getters and setters
+//--------------------------------------------------------
+
     public String getId() {
         return id;
     }
@@ -152,3 +224,5 @@ public class Order {
         this.status = status;
     }
 }
+//--------------------------------------------------------
+//endregion
