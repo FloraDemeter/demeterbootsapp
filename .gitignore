@@ -2,7 +2,7 @@
 /build/
 .gradle/
 /target/
+/bin/
 
 # Ignore Visual Studio Code settings
 .vscode/
-
