@@ -1,0 +1,8 @@
+# Ignore build directories
+/build/
+.gradle/
+/target/
+
+# Ignore Visual Studio Code settings
+.vscode/
+
