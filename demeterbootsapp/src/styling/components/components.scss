@@ -1,0 +1,92 @@
+@import "../partials/variables.scss";
+
+//button styling
+.btn {
+    width: auto;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    
+    &.primary {
+        background-color: $primary-dark;
+        color: $font-colour-primary;
+    }
+
+    &.secondary {
+        background-color: $background-colour;
+        color: $primary-light;
+    }
+}
+
+//checkbox styling
+input[type=checkbox] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    height: 21px;
+    width: 21px;
+    outline: none;
+    position: relative;
+    margin: 0;
+    cursor: pointer;
+    border: 1px solid $border;
+    background: $background;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
+    border-radius: 7px;
+    vertical-align: middle;
+
+    &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        transition: transform $d-t $d-t-e, opacity $d-o;
+    }
+
+    &:checked {
+        background: $active;
+        border-color: $active;
+        opacity: 1;
+
+        &:after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            height: 9px;
+            border: 2px solid $active-inner;
+            border-top: 0;
+            border-left: 0;
+            left: 7px;
+            top: 4px;
+            transform: rotate(43deg);
+        }
+    }
+
+    &:disabled {
+        background: $disabled;
+        cursor: not-allowed;
+        opacity: 0.9;
+
+        &:checked {
+            background: $disabled-inner;
+            border-color: $border;
+        }
+    }
+
+    &:hover:not(:checked):not(:disabled) {
+        border-color: $border-hover;
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 $focus;
+    }
+}
+
+.chk-label {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-left: 10px;
+    font-family: $font;
+    vertical-align: middle;
+}

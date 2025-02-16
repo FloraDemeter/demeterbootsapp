@@ -1,0 +1,29 @@
+//colours
+
+$primary-dark: #778d76;
+$primary-light: #90a68f;
+$secondary-dark: #c66348;
+$secondary-light: #D97B54;
+$background-colour: #F8F8FD;
+
+//fonts
+
+$font: "TT Commons Pro Regular", sans-serif;
+$font-size-large: 16px;
+$font-size-small: 12px;
+$font-colour-primary: $background-colour;
+$font-colour-secondary: $primary-dark;
+
+//checkbox styling
+$active: $primary-dark;
+$active-inner: $background-colour;
+$focus: 2px rgba(144, 166, 143, .3);
+$border: $primary-light;
+$border-hover: $primary-dark;
+$background: $background-colour;
+$disabled: $background-colour;
+$disabled-inner: $background-colour;
+$d-t: 0.3s;
+$d-o: 0.2s;
+$d-t-e: ease;
+$r: 20deg;
