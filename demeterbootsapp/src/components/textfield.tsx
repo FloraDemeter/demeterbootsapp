@@ -6,9 +6,9 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const TextField: React.FC<TextFieldProps> = ({ label, ...props }) => {
   return (
-    <div className="flex flex-col">
-      {label && <label className="font-medium mb-1">{label}</label>}
-      <input type="text" className="border p-2 rounded w-full" {...props} />
+    <div className="txt-fld">
+         <input type="text" className="txt-val" placeholder=' ' {...props} />
+        {label && <label className="txt-lbl">{label}</label>}
     </div>
   );
 };

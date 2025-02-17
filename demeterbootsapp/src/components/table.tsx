@@ -1,35 +1,285 @@
 import React from "react";
 
 interface TableProps {
-  headers: string[];
   data: any[]; // You can refine this type based on your data structure
 }
 
-const Table: React.FC<TableProps> = ({ headers, data }) => {
-  return (
-    <table className="w-full border border-gray-300">
-      <thead className="bg-gray-200">
-        <tr>
-          {headers.map((header, index) => (
-            <th key={index} className="px-4 py-2 border">
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-              <td key={colIndex} className="px-4 py-2 border">
-                {row[header]}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
+export const OrderTable: React.FC<TableProps> = ({ data }) => {
+    const headers = ["ID", "Customer Name", "Location", "Status", "Total"];
+    return (
+        <table className="tbl-main">
+            <thead className="">
+                <tr>
+                {headers.map((header, index) => (
+                    <th key={index} className="">
+                    {header}
+                    </th>
+                ))}
+                </tr>
+            </thead>
+            <tbody>
+                {data.map((row, rowIndex) => (
+                <tr key={rowIndex} className="">
+                    {headers.map((header, colIndex) => (
+                    <td key={colIndex} className="">
+                        {row[header]}
+                    </td>
+                    ))}
+                </tr>
+                ))}
+            </tbody>
+        </table>
+    );
 };
 
-export default Table;
+export const OrderLineTable: React.FC<TableProps> = ({ data }) => {
+    const headers = ["Type", "Style", "Leather", "Price", "Notes"];
+    return (
+      <table className="tbl-main">
+        <thead className="">
+          <tr>
+            {headers.map((header, index) => (
+              <th key={index} className="">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex} className="border">
+              {headers.map((header, colIndex) => (
+                <td key={colIndex} className="">
+                  {row[header]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+export const RepairTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["ID", "Customer Name", "Location", "Status", "Total"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const RepairLineTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["Type", "Repair Kind", "Leather", "Price", "Notes"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const InvoiceTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["ID", "Customer Name", "Status", "Total", "Is Payment Made?"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const InvoiceLineTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["Task ID", "Price"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const JobTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["Employee Name", "Status", "Task ID"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const CustomerTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["ID", "Name", "City", "Phone"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const MeasurementsTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["Notes", "Feet", "Bunion", "Highest Point", "Heel", "Ankle", "Calf", "Under Knee", "Height", "Calf Height", "20cm Mark"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};
+
+export const EmployeeTable: React.FC<TableProps> = ({ data }) => {
+const headers = ["ID", "Name", "Access Level", "Access Level"];
+return (
+    <table className="tbl-main">
+    <thead className="">
+        <tr>
+        {headers.map((header, index) => (
+            <th key={index} className="">
+            {header}
+            </th>
+        ))}
+        </tr>
+    </thead>
+    <tbody>
+        {data.map((row, rowIndex) => (
+        <tr key={rowIndex} className="border">
+            {headers.map((header, colIndex) => (
+            <td key={colIndex} className="">
+                {row[header]}
+            </td>
+            ))}
+        </tr>
+        ))}
+    </tbody>
+    </table>
+);
+};

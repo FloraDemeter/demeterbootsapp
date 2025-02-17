@@ -11,8 +11,12 @@ $background-colour: #F8F8FD;
 $font: "TT Commons Pro Regular", sans-serif;
 $font-size-large: 16px;
 $font-size-small: 12px;
+$font-colour-black: #000;
 $font-colour-primary: $background-colour;
 $font-colour-secondary: $primary-dark;
+
+//border
+$border-radius-size: 10px;
 
 //checkbox styling
 $active: $primary-dark;

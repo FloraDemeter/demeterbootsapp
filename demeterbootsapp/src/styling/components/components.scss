@@ -1,11 +1,18 @@
 @import "../partials/variables.scss";
 
+body {
+    font-family: $font;
+    padding: 0 2em;
+}
+
 //button styling
 .btn {
     width: auto;
     padding: 10px 20px;
-    border-radius: 10px;
+    border-radius: $border-radius-size;
     border: none;
+    font-family: $font;
+    font-size: $font-size-large;
     
     &.primary {
         background-color: $primary-dark;
@@ -19,74 +26,219 @@
 }
 
 //checkbox styling
-input[type=checkbox] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+.chk-container {
 
-    height: 21px;
-    width: 21px;
-    outline: none;
-    position: relative;
-    margin: 0;
-    cursor: pointer;
-    border: 1px solid $border;
-    background: $background;
-    transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
-    border-radius: 7px;
-    vertical-align: middle;
+    input[type=checkbox] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
 
-    &:after {
-        content: "";
-        display: block;
-        position: absolute;
-        transition: transform $d-t $d-t-e, opacity $d-o;
-    }
-
-    &:checked {
-        background: $active;
-        border-color: $active;
-        opacity: 1;
+        height: 21px;
+        width: 21px;
+        outline: none;
+        position: relative;
+        margin: 0;
+        cursor: pointer;
+        border: 1px solid $border;
+        background: $background;
+        transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
+        border-radius: 7px;
+        vertical-align: middle;
 
         &:after {
             content: "";
+            display: block;
             position: absolute;
-            width: 5px;
-            height: 9px;
-            border: 2px solid $active-inner;
-            border-top: 0;
-            border-left: 0;
-            left: 7px;
-            top: 4px;
-            transform: rotate(43deg);
+            transition: transform $d-t $d-t-e, opacity $d-o;
         }
-    }
-
-    &:disabled {
-        background: $disabled;
-        cursor: not-allowed;
-        opacity: 0.9;
 
         &:checked {
-            background: $disabled-inner;
-            border-color: $border;
+            background: $active;
+            border-color: $active;
+            opacity: 1;
+
+            &:after {
+                content: "";
+                position: absolute;
+                width: 5px;
+                height: 9px;
+                border: 2px solid $active-inner;
+                border-top: 0;
+                border-left: 0;
+                left: 7px;
+                top: 4px;
+                transform: rotate(43deg);
+            }
+        }
+
+        &:disabled {
+            background: $disabled;
+            cursor: not-allowed;
+            opacity: 0.9;
+
+            &:checked {
+                background: $disabled-inner;
+                border-color: $border;
+            }
+        }
+
+        &:hover:not(:checked):not(:disabled) {
+            border-color: $border-hover;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 $focus;
         }
     }
 
-    &:hover:not(:checked):not(:disabled) {
-        border-color: $border-hover;
-    }
-
-    &:focus {
-        box-shadow: 0 0 0 $focus;
+    .chk-label {
+        display: inline-block;
+        cursor: pointer;
+        margin-right: 10px;
+        margin-left: 10px;
+        font-family: $font;
+        vertical-align: middle;
     }
 }
 
-.chk-label {
-    display: inline-block;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-left: 10px;
-    font-family: $font;
-    vertical-align: middle;
+//table styling
+.tbl-main {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    min-width: 300px;
+    background: $background-colour;
+    color: $font-colour-black;
+    border-radius: $border-radius-size;
+    overflow: hidden;
+
+    tr {
+        border-top: 1px solid $primary-light;
+        border-bottom: 1px solid $primary-light;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    th, td {
+        text-align: left;
+        padding: 0.75em 1em;
+    }
+
+    th {
+        background: $primary-dark;
+        font-weight: bold;
+        color: $font-colour-primary;
+    }
+
+    td {
+        &:first-child {
+            padding-top: .5em;
+        }
+
+        &:last-child {
+            padding-bottom: .5em;
+        }
+    }
 }
+
+//text fields
+.txt-fld {
+    position: relative;
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+  
+    .txt-val {
+      width: 100%;
+      border: 2px solid $primary-light;
+      border-radius: 8px;
+      padding: 1.2rem 1rem 0.5rem;
+      font-size: 1.1rem;
+      outline: none;
+      background-color: $background-colour;
+      transition: border-color 0.3s ease;
+  
+      &::placeholder {
+        color: transparent;
+      }
+  
+      &:focus {
+        border-color: $primary-dark;
+      }
+    }
+  
+    .txt-lbl {
+      position: absolute;
+      left: 0.8rem;
+      top: 1.2rem;
+      font-size: $font-size-large;
+      color: $primary-light;
+      background-color: $background-colour;
+      padding: 0 0.3rem;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+  
+    .txt-val:focus ~ .txt-lbl,
+    .txt-val:not(:placeholder-shown) ~ .txt-lbl {
+      top: -0.3rem;
+      font-size: $font-size-small;
+      color: $primary-dark;
+    }
+
+    .txt-val:focus{
+      border-color: $primary-dark;
+    }
+}
+
+.txt-area {
+    position: relative;
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+  
+    .txt-val {
+      width: 100%;
+      border: 2px solid $primary-light;
+      border-radius: 8px;
+      padding: 1.2rem 1rem 0.5rem;
+      font-size: 1.1rem;
+      outline: none;
+      background-color: $background-colour;
+      transition: border-color 0.3s ease;
+      resize: none;
+      overflow: hidden;
+  
+      &::placeholder {
+        color: transparent;
+      }
+  
+      &:focus {
+        border-color: $primary-dark;
+      }
+    }
+  
+    .txt-lbl {
+      position: absolute;
+      left: 0.8rem;
+      top: 1.2rem;
+      font-size: $font-size-large;
+      color: $primary-light;
+      background-color: $background-colour;
+      padding: 0 0.3rem;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+  
+    .txt-val:focus ~ .txt-lbl,
+    .txt-val:not(:placeholder-shown) ~ .txt-lbl {
+      top: -0.3rem;
+      font-size: $font-size-small;
+      color: $primary-dark;
+    }
+
+    .txt-val:focus{
+      border-color: $primary-dark;
+    }
+  }
+  
