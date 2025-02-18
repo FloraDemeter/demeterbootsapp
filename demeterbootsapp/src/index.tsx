@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import MainTemplate from './maintemplate';
+import Landing from './landing';
+import Login from './login';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <Login />
+    <Landing/>
+    <MainTemplate />
   </React.StrictMode>
 );

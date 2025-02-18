@@ -5,28 +5,22 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "primary" | "secondary";
 }
 
-const Button: React.FC<ButtonProps> = ({ variant = "primary",children, ...props }) => {
+interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+    variant?: "primary" | "secondary";
+}
 
-    const [data, setData] = useState<string | null>(null);
-
-    const handleClick = async () => {
-        console.log("Button clicked!");
-        try {
-            console.log("Fetching data...");
-            const result = await fetchData(); // Call API
-            setData(JSON.stringify(result, null, 2)); // Store API response
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        } finally {
-            console.log("Data fetched!");
-        }
-    };
-
+export const Button: React.FC<ButtonProps> = ({ variant = "primary",children, ...props }) => {
     return (
-        <button className={`btn ${variant}`} onClick={handleClick} {...props}>
+        <button className={`btn ${variant}`} {...props}>
             {children}
         </button>
     );
 };
 
-export default Button;
+export const RedirectButton: React.FC<LinkProps> = ({variant = "primary", children, ...props}) => {
+    return (
+        <a className={`redirect ${variant}`} {...props}>
+            {children}
+        </a>
+    );
+};

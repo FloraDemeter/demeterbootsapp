@@ -1,18 +1,14 @@
 @import "../partials/variables.scss";
 
-body {
-    font-family: $font;
-    padding: 0 2em;
-}
-
-//button styling
-.btn {
-    width: auto;
-    padding: 10px 20px;
+//button and redirect styling
+.btn, .redirect {
+    padding: 15px 0px;
     border-radius: $border-radius-size;
     border: none;
     font-family: $font;
     font-size: $font-size-large;
+    text-align: center;
+    width: 100%;
     
     &.primary {
         background-color: $primary-dark;
@@ -23,6 +19,10 @@ body {
         background-color: $background-colour;
         color: $primary-light;
     }
+}
+
+.redirect {
+  text-decoration: none;
 }
 
 //checkbox styling
