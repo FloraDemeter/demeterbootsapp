@@ -1,16 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import MainTemplate from './maintemplate';
-import Landing from './landing';
-import Login from './login';
+import App from './App';
+import './styling/maincontent.scss';
+import './styling/components/components.scss';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <Login />
-    <Landing/>
-    <MainTemplate />
+    <Router>
+      <App />
+    </Router>
   </React.StrictMode>
 );

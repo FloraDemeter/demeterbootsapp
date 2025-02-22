@@ -42,7 +42,7 @@
         border: 1px solid $border;
         background: $background;
         transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
-        border-radius: 7px;
+        border-radius: $border-radius-size;
         vertical-align: middle;
 
         &:after {
@@ -152,8 +152,8 @@
     .txt-val {
       width: 100%;
       border: 2px solid $primary-light;
-      border-radius: 8px;
-      padding: 1.2rem 1rem 0.5rem;
+      border-radius: $border-radius-size;
+      padding: 1.2rem 0rem 0.5rem 1rem;
       font-size: 1.1rem;
       outline: none;
       background-color: $background-colour;
@@ -201,7 +201,7 @@
       width: 100%;
       border: 2px solid $primary-light;
       border-radius: 8px;
-      padding: 1.2rem 1rem 0.5rem;
+      padding: 1.2rem 0rem 0.5rem 1rem;
       font-size: 1.1rem;
       outline: none;
       background-color: $background-colour;
