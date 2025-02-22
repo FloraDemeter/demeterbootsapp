@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { fetchData } from "../services/api";
+import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "primary" | "secondary";

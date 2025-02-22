@@ -1,14 +1,15 @@
 import React from "react";
-import { RedirectButton } from "./components/button";
 import "./styling/components/components.scss";
+import ContentLists from "./contentLists/contentLists";
+import ContentForms from "./contentForms/contentForms";
+import { useSearchParams, Navigate } from "react-router-dom";
 
-interface ContentProps {
-    type: "card" | "list";
+export interface ContentProps {
     content: "order" | "repair" | "invoice" | "customer" | "employee" | "jobs" | "stock";
     data: any[];
 }
 
-const Content: React.FC<ContentProps> = ({type, content, data}) => {
+const Content: React.FC<ContentProps> = ({content, data}) => {
     const titles: Record<ContentProps["content"], string> = {
         order: "Orders",
         repair: "Repairs",
@@ -18,15 +19,25 @@ const Content: React.FC<ContentProps> = ({type, content, data}) => {
         jobs: "Jobs",
         stock: "Stock"
     };
-    
+
+    const [searchParams] = useSearchParams();
+    const viewParam = searchParams.has("view");
+
+    const viewID = searchParams.get("view");
+
+    if (viewParam && content === "jobs") {
+        return <Navigate to="/landing" replace/>
+    }
     return (
         <div className="content">
-            <h1>{titles[content]}</h1>
+            <h1>{titles[content]} {viewID}</h1>
 
-            {type === "card" ? (
-                <p>this is a card page</p>
-            ): (
-                <p>this is a list page</p>
+            {viewParam ? (
+                content !== "jobs" && (
+                    <ContentForms content={content as Exclude<ContentProps["content"], "jobs">} />
+                )
+            ) : (
+                <ContentLists content={content} />
             )}
         </div>
     );
