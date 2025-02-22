@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import TextField from "./components/textfield";
-import { Button } from "./components/button";
+import TextField from "../../components/elements/textfield";
+import { Button } from "../../components/elements/button";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();

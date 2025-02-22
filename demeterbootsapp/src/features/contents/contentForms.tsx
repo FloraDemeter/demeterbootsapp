@@ -1,11 +1,11 @@
 import React from "react";
-import OrderForm from "./orderForm"
-import RepairForm from "./repairForm"
-import InvoiceForm from "./invoiceForm"
-import CustomerForm from "./customerForm"
-import EmployeeForm from "./employeeForm"
-import StockForm from "./stockForm"
-import { ContentProps } from "../content"
+import OrderForm from "../orders/orderForm"
+import RepairForm from "../repairs/repairForm"
+import InvoiceForm from "../invoices/invoiceForm"
+import CustomerForm from "../customers/customerForm"
+import EmployeeForm from "../employees/employeeForm"
+import StockForm from "../stock/stockForm"
+import { ContentProps } from "../contents/content"
 
 
 interface FormProps {

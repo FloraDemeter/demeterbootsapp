@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './styling/maincontent.scss';
-import './styling/components/components.scss';
+import './components/styling/maincontent.scss';
+import './components/styling/components/components.scss';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(

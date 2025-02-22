@@ -1,6 +1,6 @@
 import React from "react";
-import { RedirectButton } from "./components/button";
-import "./styling/components/components.scss";
+import { RedirectButton } from "../../components/elements/button";
+import "../styling/components/components.scss";
 
 
 const SideMenu: React.FC = () => {

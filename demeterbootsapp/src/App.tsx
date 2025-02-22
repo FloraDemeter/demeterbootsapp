@@ -1,9 +1,9 @@
 import React from 'react';
 import { useEffect}  from 'react';
 import { Routes, Route, useLocation} from 'react-router-dom';
-import MainTemplate from './maintemplate';
-import Landing from './landing';
-import Login from './login';
+import MainTemplate from './components/layout/maintemplate';
+import Landing from './features/dashboard/landing';
+import Login from './features/auth/login';
 
 const App: React.FC = () => {
     const currentLocation = useLocation();

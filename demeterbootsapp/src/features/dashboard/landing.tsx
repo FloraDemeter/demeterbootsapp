@@ -1,7 +1,7 @@
 import React from 'react';
-import { RedirectButton } from './components/button';
-import List from './components/list';
-import './styling/components/components.scss'
+import { RedirectButton } from '../../components/elements/button';
+import List from '../../components/elements/list';
+import '../../components/styling/components/components.scss';
 
 interface LandingProps {
     username: string;

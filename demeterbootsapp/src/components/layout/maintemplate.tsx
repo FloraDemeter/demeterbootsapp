@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useSearchParams, Navigate } from "react-router-dom";
 import SideMenu from "./sidemenu";
-import Content from "./content";
+import Content from "../../features/contents/content";
 
 // Define allowed content types
 type ContentType = "order" | "repair" | "invoice" | "customer" | "employee" | "jobs" | "stock";

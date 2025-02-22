@@ -1,7 +1,7 @@
 import React from "react";
-import "./styling/components/components.scss";
-import ContentLists from "./contentLists/contentLists";
-import ContentForms from "./contentForms/contentForms";
+import "../../components/styling/components/components.scss";
+import ContentLists from "./contentLists";
+import ContentForms from "./contentForms";
 import { useSearchParams, Navigate } from "react-router-dom";
 
 export interface ContentProps {
