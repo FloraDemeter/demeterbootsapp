@@ -6,7 +6,7 @@ import "../styling/components/components.scss";
 const SideMenu: React.FC = () => {
     return (
         <div className="side-menu">
-            <RedirectButton href="/orders" variant="primary">Orders</RedirectButton>
+            <RedirectButton href="/order" variant="primary">Orders</RedirectButton>
             <RedirectButton href="/repair" variant="primary">Repair</RedirectButton>
             <RedirectButton href="/invoice" variant="primary">Invoice</RedirectButton>
             <RedirectButton href="/customer" variant="primary">Customer</RedirectButton>

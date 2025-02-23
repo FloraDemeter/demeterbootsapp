@@ -1,12 +1,12 @@
 import React from "react";
-import OrderList from "../orders/orderList"
-import RepairList from "../repairs/repairList"
-import InvoiceList from "../invoices/invoiceList"
-import CustomerList from "../customers/customerList"
-import EmployeeList from "../employees/employeeList"
-import JobsList from "../jobs/jobsList"
-import StockList from "../stock/stockList"
-import { ContentProps } from "../contents/content"
+import OrderList from "../../features/orders/orderList"
+import RepairList from "../../features/repairs/repairList"
+import InvoiceList from "../../features/invoices/invoiceList"
+import CustomerList from "../../features/customers/customerList"
+import EmployeeList from "../../features/employees/employeeList"
+import JobsList from "../../features/jobs/jobsList"
+import StockList from "../../features/stock/stockList"
+import { ContentProps } from "./content"
 
 interface ListProps {
     content: ContentProps["content"]

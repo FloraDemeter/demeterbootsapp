@@ -1,0 +1,66 @@
+@import '../partials/_variables.scss';
+    
+form {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    .column-left, .column-right {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .column-left {
+
+        .txt-fld {
+            max-width: 400px;
+        }
+    }
+
+    .column-right {
+        align-items: flex-end;
+
+        .txt-fld {
+            margin-right:16px;
+            min-width: 400px;
+        }
+    }
+
+    .btn {
+        width:420px;
+    }
+}
+
+.popup-content {
+    form {
+        .column-left, .column-right {
+            align-items: flex-start;
+
+            .txt-fld {
+                max-width: 300px;
+                min-width: 300px;
+            }
+        }
+    }
+}
+
+#measurement-popup {
+    min-width: 700px;
+
+    form {
+    
+        .btn, .txt-area{
+            grid-column: span 2;
+        }
+
+        .btn {
+            width: 680px;
+        }
+
+        .txt-area {
+            max-width: 660px;
+        }
+    }
+    
+}
