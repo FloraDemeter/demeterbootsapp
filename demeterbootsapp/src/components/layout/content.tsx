@@ -30,11 +30,16 @@ const Content: React.FC<ContentProps> = ({content, data}) => {
         return <Navigate to="/landing" replace/>
     }
 
+    if (viewID === 'new' && (content === "jobs" || content === 'invoice')) {
+        return <Navigate to="/landing" replace/>
+    }
+    console.log(viewParam, content);
+    console.log(!viewParam && (content !== 'jobs' && content !== 'invoice'));
     return (
         <div className="content">
             <div className="content-header">
                 <h1>{titles[content]} {viewID !== "new" ? viewID : ''}</h1>
-                {!viewParam || (content === "jobs" || content === "invoice") ? (
+                {!viewParam && (content !== "jobs" && content !== "invoice") ? (
                     <RedirectButton href="?view=new" variant="primary">Add New {titles[content]}</RedirectButton>
                 ) : null}
             </div>

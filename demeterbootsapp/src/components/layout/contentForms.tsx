@@ -16,7 +16,7 @@ const ContentForm: React.FC<FormProps> = ({ content }) => {
     switch (content) {
         case "order": return <OrderForm data={[]}/>;
         case "repair": return <RepairForm data={[]} />;
-        case "invoice": return <InvoiceForm data={[]} />;
+        case "invoice": return <InvoiceForm />;
         case "customer": return <CustomerForm />;
         case "employee": return <EmployeeForm />;
         case "stock": return <StockForm data={[]} />;
