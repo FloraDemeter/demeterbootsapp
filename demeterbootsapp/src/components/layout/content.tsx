@@ -33,8 +33,8 @@ const Content: React.FC<ContentProps> = ({content, data}) => {
     return (
         <div className="content">
             <div className="content-header">
-                <h1>{titles[content]} {viewID}</h1>
-                {!viewParam || content === "jobs" ? (
+                <h1>{titles[content]} {viewID !== "new" ? viewID : ''}</h1>
+                {!viewParam || (content === "jobs" || content === "invoice") ? (
                     <RedirectButton href="?view=new" variant="primary">Add New {titles[content]}</RedirectButton>
                 ) : null}
             </div>

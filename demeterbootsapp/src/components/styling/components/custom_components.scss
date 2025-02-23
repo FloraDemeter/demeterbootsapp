@@ -62,5 +62,13 @@ form {
             max-width: 660px;
         }
     }
-    
+}
+
+.employee-form {
+    form {
+        .btn {
+            width:auto;
+            grid-column: span 2;
+        }
+    }
 }

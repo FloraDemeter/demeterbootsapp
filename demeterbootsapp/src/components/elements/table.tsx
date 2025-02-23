@@ -200,6 +200,34 @@ return (
 );
 };
 
+export const EmployeeJobsTable: React.FC<TableProps> = ({ data }) => {
+    const headers = ["Task ID", "Status"];
+    return (
+        <table className="tbl-main">
+        <thead className="">
+            <tr>
+            {headers.map((header, index) => (
+                <th key={index} className="">
+                {header}
+                </th>
+            ))}
+            </tr>
+        </thead>
+        <tbody>
+            {data.map((row, rowIndex) => (
+            <tr key={rowIndex} className="border">
+                {headers.map((header, colIndex) => (
+                <td key={colIndex} className="">
+                    {row[header]}
+                </td>
+                ))}
+            </tr>
+            ))}
+        </tbody>
+        </table>
+    );
+    };
+
 export const CustomerTable: React.FC<TableProps> = ({ data }) => {
 const headers = ["ID", "Name", "City", "Phone"];
 return (
@@ -257,7 +285,7 @@ return (
 };
 
 export const EmployeeTable: React.FC<TableProps> = ({ data }) => {
-const headers = ["ID", "Name", "Access Level", "Access Level"];
+const headers = ["ID", "Name", "Phone", "Access Level"];
 return (
     <table className="tbl-main">
     <thead className="">
