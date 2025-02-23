@@ -4,7 +4,7 @@ import "../../components/styling/components/custom_components.scss";
 import ContentLists from "./contentLists";
 import ContentForms from "./contentForms";
 import { useSearchParams, Navigate } from "react-router-dom";
-import { Button } from "../elements/button";
+import { Button, RedirectButton } from "../elements/button";
 
 export interface ContentProps {
     content: "order" | "repair" | "invoice" | "customer" | "employee" | "jobs" | "stock";
@@ -29,17 +29,13 @@ const Content: React.FC<ContentProps> = ({content, data}) => {
     if (viewParam && content === "jobs") {
         return <Navigate to="/landing" replace/>
     }
+
     return (
         <div className="content">
             <div className="content-header">
                 <h1>{titles[content]} {viewID}</h1>
                 {!viewParam || content === "jobs" ? (
-                    <Button 
-                        type="button" 
-                        variant="primary" 
-                        id={`add-${titles[content].toLowerCase()}`}
-                    >Add New {titles[content]}
-                    </Button>
+                    <RedirectButton href="?view=new" variant="primary">Add New {titles[content]}</RedirectButton>
                 ) : null}
             </div>
             {viewParam ? (

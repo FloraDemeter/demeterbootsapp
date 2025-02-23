@@ -17,7 +17,7 @@ const ContentForm: React.FC<FormProps> = ({ content }) => {
         case "order": return <OrderForm data={[]}/>;
         case "repair": return <RepairForm data={[]} />;
         case "invoice": return <InvoiceForm data={[]} />;
-        case "customer": return <CustomerForm data={[]} />;
+        case "customer": return <CustomerForm />;
         case "employee": return <EmployeeForm data={[]} />;
         case "stock": return <StockForm data={[]} />;
     }
