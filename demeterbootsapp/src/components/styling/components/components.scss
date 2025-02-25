@@ -242,4 +242,46 @@
       border-color: $primary-dark;
     }
   }
+
+  .dropdown-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    min-width: 300px;
+    
+    .dropdown {
+      width: 100%;
+      border: 2px solid $primary-light;
+      border-radius: $border-radius-size;
+      padding: 1.2rem 0rem 0.5rem 1rem;
+      font-size: 1.1rem;
+      outline: none;
+      background-color: $background-colour;
+      transition: border-color 0.3s ease;
+      cursor: pointer;
+  
+      &:focus {
+        border-color: $primary-dark;
+      }
+    }
+  
+    .dropdown-label {
+      position: absolute;
+      left: 0.8rem;
+      top: 1.2rem;
+      font-size: $font-size-large;
+      color: $primary-light;
+      background-color: $background-colour;
+      padding: 0 0.3rem;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+  
+    .dropdown:focus ~ .dropdown-label,
+    .dropdown:not(:placeholder-shown) ~ .dropdown-label {
+      top: -0.3rem;
+      font-size: $font-size-small;
+      color: $primary-dark;
+    }
+  }
   
