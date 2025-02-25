@@ -65,6 +65,7 @@ const CustomerForm: React.FC = () => {
             <MeasurementsTable data={measurementInfo} />
             <Button variant="primary" type="button" onClick={() => setIsPopUpOpen(true)}>Add new measurement</Button>
             <MeasurementPopUp isPopUpOpen={isPopUpOpen} setIsPopUpOpen={setIsPopUpOpen} />
+            <Button variant="primary" type="button" >Show...</Button>
         </div>
     );
 };

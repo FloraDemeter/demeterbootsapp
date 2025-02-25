@@ -56,7 +56,8 @@ const InvoiceForm: React.FC = () => {
                     <Button type="submit" variant="primary">Update</Button>
                 </div>
             </form>
-            <InvoiceLineTable data={lineInfo} />            
+            <InvoiceLineTable data={lineInfo} /> 
+            <Button variant="primary">Open Document</Button>           
         </div>
     );
 };
