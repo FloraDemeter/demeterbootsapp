@@ -42,13 +42,13 @@ const OrderForm: React.FC = () => {
         { Type: "Boots", Style: "testing testing", Leather: "red", Price: 500, Notes: "make it extra wide"},
         { Type: "Chaps", Style: "testing testing", Leather: "black", Price: 200, Notes: "tessst"}
     ];
-    const [order, setCustomerInfo] = useState(defaultInfo);
-    const [orderline, setMeasurementInfo] = useState(defaultLineInfo);
+    const [order, setOrderInfo] = useState(defaultInfo);
+    const [orderline, setOrderLineInfo] = useState(defaultLineInfo);
 
     useEffect(() => {
         if (!isNew) {
-            setCustomerInfo(dummyOrderData);
-            setMeasurementInfo(dummyLineData);
+            setOrderInfo(dummyOrderData);
+            setOrderLineInfo(dummyLineData);
             setSelectedCustomerType(dummyOrderData.Customer);
             setSelectedStatus("1");
         }

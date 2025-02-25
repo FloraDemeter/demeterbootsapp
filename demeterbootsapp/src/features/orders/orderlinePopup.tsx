@@ -34,7 +34,7 @@ const OrderLinePopUp: React.FC<OrderLinePopUpProps> = ({isPopUpOpen, setIsPopUpO
     
     return (
         <PopUp isOpen={isPopUpOpen} popUpName="orderLine-popup" onClose={() => setIsPopUpOpen(false)}>
-            <h2> {isAdd ? 'Add' : 'Edit'} new OrderLine</h2>
+            <h2> {isAdd ? 'Add new' : 'Edit'} OrderLine</h2>
             <form onSubmit={handleSubmit}>
                 <div className="column-left">
                     <Textarea label="Notes" />

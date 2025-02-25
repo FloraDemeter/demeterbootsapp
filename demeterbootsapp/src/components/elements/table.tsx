@@ -89,7 +89,7 @@ return (
 };
 
 export const RepairLineTable: React.FC<TableProps> = ({ data }) => {
-const headers = ["Type", "Repair Kind", "Leather", "Price", "Notes"];
+const headers = ["Type", "Repair Kind", "Price", "Notes"];
 return (
     <table className="tbl-main">
     <thead className="">

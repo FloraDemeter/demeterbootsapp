@@ -15,7 +15,7 @@ interface FormProps {
 const ContentForm: React.FC<FormProps> = ({ content }) => {
     switch (content) {
         case "order": return <OrderForm />;
-        case "repair": return <RepairForm data={[]} />;
+        case "repair": return <RepairForm />;
         case "invoice": return <InvoiceForm />;
         case "customer": return <CustomerForm />;
         case "employee": return <EmployeeForm />;
