@@ -39,7 +39,7 @@ const Content: React.FC<ContentProps> = ({content, data}) => {
         <div className="content">
             <div className="content-header">
                 <h1>{titles[content]} {viewID !== "new" ? viewID : ''}</h1>
-                {!viewParam && (content !== "jobs" && content !== "invoice") ? (
+                {!viewParam && (content !== "jobs" && content !== "invoice" && content !== "stock") ? (
                     <RedirectButton href="?view=new" variant="primary">Add New {titles[content]}</RedirectButton>
                 ) : null}
             </div>
