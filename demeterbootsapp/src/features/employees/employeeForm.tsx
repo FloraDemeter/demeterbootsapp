@@ -10,6 +10,8 @@ const EmployeeForm: React.FC = () => {
     const [searchParams] = useSearchParams();
     const isNew = searchParams.get("view") === "new";
 
+    const today = new Date();
+
     const defaultInfo = { 
         FirstName: "", 
         LastName: "", 
@@ -22,7 +24,7 @@ const EmployeeForm: React.FC = () => {
         password:"",
         isActive: true,
         accessLevel: "",
-        startDate: Date.now()
+        startDate: today
     };
 
     const dummyData = { 
@@ -37,7 +39,7 @@ const EmployeeForm: React.FC = () => {
         password:"testing",
         isActive: true,
         accessLevel: "Admin",
-        startDate: Date.now()
+        startDate: today
     };
 
     const defaultJobInfo: any[] = [];
@@ -72,8 +74,8 @@ const EmployeeForm: React.FC = () => {
                     <TextField label="City" value={customerInfo.City} />
                     <TextField label="Postcode" value={customerInfo.PostCode} />
                     <TextField label="Access Level" value={customerInfo.accessLevel} />
-                    <TextField label="Start Date" type="date" value={customerInfo.startDate} />
-                    <Checkbox label="Is User Active?" checked={customerInfo.isActive} />
+                    <TextField label="Start Date" type="date" value={customerInfo.startDate.toISOString().split("T")[0]} />
+                    <Checkbox label="Is User Active?" defaultChecked={customerInfo.isActive} />
                 </div>
                 <Button type="submit" variant="primary">Save</Button>
             </form>

@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 
-interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> { 
+interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
+    defaultChecked?: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ label, ...props }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ label, defaultChecked=false, ...props }) => {
+    const [isChecked, setIsChecked] = useState(defaultChecked);
+
+    const handleClick = () => {
+        setIsChecked((prev) => !prev);
+    };
+
     return (
-        <label className="chk-container">
-            <span className="chk-label">{label}</span>
-            <input type="checkbox" className="chkbox" {...props} />
-        </label>
+        <div className={`checkbox-field ${isChecked ? "checked" : ""}`} onClick={handleClick}>
+            <input 
+                type="checkbox" 
+                className="checkbox-input"
+            />
+            <label className="checkbox-label">{label}</label>
+        </div>
     );
 };
 

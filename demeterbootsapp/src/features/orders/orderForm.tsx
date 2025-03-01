@@ -7,6 +7,7 @@ import { OrderLineTable } from '../../components/elements/table';
 import OrderLinePopUp  from './orderlinePopup';
 import DropDown from '../../components/elements/dropdown';
 import Checkbox from '../../components/elements/checkbox';
+import ConfirmPopUp from '../../components/layout/confirmPopUp';
 
 const OrderForm: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -59,6 +60,7 @@ const OrderForm: React.FC = () => {
 
     const [isAddPopUpOpen, setIsAddPopUpOpen] = useState(false);
     const [isEditPopUpOpen, setIsEditPopUpOpen] = useState(false);
+    const [isConfirmPopUpOpen, setIsConfirmPopUpOpen] = useState(false);
 
     const customers = [
         {value:"", label:"Please select one"},
@@ -87,19 +89,25 @@ const OrderForm: React.FC = () => {
                 <div className="column-right">
                     <DropDown label="Status" options={statuses} selectedValue={selectedStatus} onChange={setSelectedStatus} />
                     <TextField label="Total" value={order.Total} />
-                    <Checkbox label="Is warranty Accepted" checked={order.isWarrantyAcccepted} />
+                    <Checkbox label="Is warranty Accepted" defaultChecked={order.isWarrantyAcccepted} />
                 </div>
-                <Button type="submit" variant="primary">Save</Button>
+                <div className="full-width">
+                    <Button type="submit" variant="primary">Save</Button>
+                </div>
             </form>
-            <OrderLineTable data={orderline} />
-            <Button variant="primary" type="button" onClick={() => setIsAddPopUpOpen(true)}>Add new order line</Button>
-            <OrderLinePopUp isPopUpOpen={isAddPopUpOpen} setIsPopUpOpen={setIsAddPopUpOpen} isAdd={true} />
-            <Button variant="primary" type="button" onClick={() => setIsEditPopUpOpen(true)}>Edit new order line</Button>
-            <OrderLinePopUp isPopUpOpen={isEditPopUpOpen} setIsPopUpOpen={setIsEditPopUpOpen} isAdd={false} />
-            <Button variant="primary" type="button" onClick={() => deleteOrderLine()}>Delete new order line</Button>
-            <Button variant="primary" type="button" onClick={() => generateNewInvoice()}>Generate new invoice</Button>
-            {/* <GenerateInvoicePopUp isPopUpOpen={isInvoicePopUpOpen} setIsPopUpOpen={setIsInvoicePopUpOpen} /> */}
             
+            <div className="actions">
+                <Button variant="primary" type="button" onClick={() => setIsAddPopUpOpen(true)}>Add new order line</Button>
+                <OrderLinePopUp isPopUpOpen={isAddPopUpOpen} setIsPopUpOpen={setIsAddPopUpOpen} isAdd={true} />
+                <Button variant="primary" type="button" onClick={() => setIsEditPopUpOpen(true)}>Edit new order line</Button>
+                <OrderLinePopUp isPopUpOpen={isEditPopUpOpen} setIsPopUpOpen={setIsEditPopUpOpen} isAdd={false} />
+                <Button variant="primary" type="button" onClick={() => setIsConfirmPopUpOpen(true)}>Delete new order line</Button>
+                <ConfirmPopUp isPopUpOpen={isConfirmPopUpOpen} setIsPopUpOpen={setIsConfirmPopUpOpen} purpose="delete" text="Are you sure you want to delete this order line?" />
+                <Button variant="primary" type="button" onClick={() => generateNewInvoice()}>Generate new invoice</Button>
+                {/* <GenerateInvoicePopUp isPopUpOpen={isInvoicePopUpOpen} setIsPopUpOpen={setIsInvoicePopUpOpen} source="order" /> */}
+            </div>
+            
+            <OrderLineTable data={orderline} />
         </div>
     );
 };

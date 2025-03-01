@@ -7,12 +7,14 @@ import { Button } from '../../components/elements/button';
 
 const InvoiceForm: React.FC = () => {
 
+    const today = new Date();
+
     const defaultInvoiceInfo = { 
         CustomerName: "", 
         Status: "", 
         Payment: "", 
         Total: 0, 
-        InvoiceDate: Date.now(), 
+        InvoiceDate: today, 
         PaymentDate: "",
         IsPaid: true 
     };
@@ -22,7 +24,7 @@ const InvoiceForm: React.FC = () => {
         Status: "In Process", 
         Payment: "Card", 
         Total: 5412, 
-        InvoiceDate: Date.now(), 
+        InvoiceDate: today, 
         PaymentDate: "",
         IsPaid: true 
     };
@@ -38,26 +40,30 @@ const InvoiceForm: React.FC = () => {
     useEffect(() => {
         setLineInfo(dummyLineData);
         setInvoiceInfo(dummyInvoiceData);
-    });
+    }, []);
+
+    const openDocument = () => {
+
+    }
 
     return (
         <div className='invoice-form'>
             <form>
                 <div className="column-left">
                     <TextField label="Customer Name" value={invoiceInfo.CustomerName} />
-                    <TextField label="Status" value={invoiceInfo.Status} />
-                    <TextField label="Payment Type" value={invoiceInfo.Payment} />
+                    <TextField type="date" label="Invoice Date" value={invoiceInfo.InvoiceDate.toISOString().split("T")[0]} />
                     <TextField label="Total" value={invoiceInfo.Total} />
+                    <TextField label="Status" value={invoiceInfo.Status} />
                 </div>
                 <div className="column-right">
-                    <TextField type="date" label="Invoice Date" value={invoiceInfo.InvoiceDate} />
+                    <Checkbox label="Is invoice paid?" defaultChecked={invoiceInfo.IsPaid} />
+                    <TextField label="Payment Type" value={invoiceInfo.Payment} />
                     <TextField type="date" label="Payment Date" value={invoiceInfo.PaymentDate} />
-                    <Checkbox label="Is invoice paid?" checked={invoiceInfo.IsPaid} />
                     <Button type="submit" variant="primary">Update</Button>
                 </div>
             </form>
+            <Button variant="primary" type="button" onClick={openDocument}>Open Document</Button>           
             <InvoiceLineTable data={lineInfo} /> 
-            <Button variant="primary">Open Document</Button>           
         </div>
     );
 };

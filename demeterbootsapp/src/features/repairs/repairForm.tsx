@@ -7,6 +7,7 @@ import { RepairLineTable } from '../../components/elements/table';
 import RepairLinePopUp  from './repairlinePopup';
 import DropDown from '../../components/elements/dropdown';
 import Checkbox from '../../components/elements/checkbox';
+import ConfirmPopUp from '../../components/layout/confirmPopUp';
 
 const RepairForm: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -59,6 +60,7 @@ const RepairForm: React.FC = () => {
 
     const [isAddPopUpOpen, setIsAddPopUpOpen] = useState(false);
     const [isEditPopUpOpen, setIsEditPopUpOpen] = useState(false);
+    const [isConfirmPopUpOpen, setIsConfirmPopUpOpen] = useState(false);
 
     const customers = [
         {value:"", label:"Please select one"},
@@ -87,19 +89,24 @@ const RepairForm: React.FC = () => {
                 <div className="column-right">
                     <DropDown label="Status" options={statuses} selectedValue={selectedStatus} onChange={setSelectedStatus} />
                     <TextField label="Total" value={repair.Total} />
-                    <Checkbox label="Is warranty Accepted" checked={repair.isWarrantyAcccepted} />
+                    <Checkbox label="Is warranty Accepted" defaultChecked={repair.isWarrantyAcccepted} />
                 </div>
-                <Button type="submit" variant="primary">Save</Button>
+                <div className="full-width">
+                    <Button type="submit" variant="primary">Save</Button>
+                </div>
             </form>
+            <div className="actions">
+                <Button variant="primary" type="button" onClick={() => setIsAddPopUpOpen(true)}>Add new repair line</Button>
+                <RepairLinePopUp isPopUpOpen={isAddPopUpOpen} setIsPopUpOpen={setIsAddPopUpOpen} isAdd={true} />
+                <Button variant="primary" type="button" onClick={() => setIsEditPopUpOpen(true)}>Edit repair line</Button>
+                <RepairLinePopUp isPopUpOpen={isEditPopUpOpen} setIsPopUpOpen={setIsEditPopUpOpen} isAdd={false} />
+                <Button variant="primary" type="button" onClick={() => setIsConfirmPopUpOpen(true)}>Delete repair line</Button>
+                <ConfirmPopUp isPopUpOpen={isConfirmPopUpOpen} setIsPopUpOpen={setIsConfirmPopUpOpen} purpose="delete" text="Are you sure you want to delete this repair line?" />
+                <Button variant="primary" type="button" onClick={() => generateNewInvoice()}>Generate new invoice</Button>
+                {/* <GenerateInvoicePopUp isPopUpOpen={isInvoicePopUpOpen} setIsPopUpOpen={setIsInvoicePopUpOpen} /> */}
+            </div>
+
             <RepairLineTable data={repairline} />
-            <Button variant="primary" type="button" onClick={() => setIsAddPopUpOpen(true)}>Add new repair line</Button>
-            <RepairLinePopUp isPopUpOpen={isAddPopUpOpen} setIsPopUpOpen={setIsAddPopUpOpen} isAdd={true} />
-            <Button variant="primary" type="button" onClick={() => setIsEditPopUpOpen(true)}>Edit repair line</Button>
-            <RepairLinePopUp isPopUpOpen={isEditPopUpOpen} setIsPopUpOpen={setIsEditPopUpOpen} isAdd={false} />
-            <Button variant="primary" type="button" onClick={() => deleteRepairLine()}>Delete repair line</Button>
-            <Button variant="primary" type="button" onClick={() => generateNewInvoice()}>Generate new invoice</Button>
-            {/* <GenerateInvoicePopUp isPopUpOpen={isInvoicePopUpOpen} setIsPopUpOpen={setIsInvoicePopUpOpen} /> */}
-            
         </div>
     );
 };

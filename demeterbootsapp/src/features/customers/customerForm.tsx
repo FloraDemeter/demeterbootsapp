@@ -4,6 +4,7 @@ import TextField from '../../components/elements/textfield';
 import { Button } from '../../components/elements/button';
 import { MeasurementsTable } from '../../components/elements/table';
 import MeasurementPopUp from './measurementPopup';
+import ConfirmPopUp from '../../components/layout/confirmPopUp';
 
 const CustomerForm: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -45,6 +46,7 @@ const CustomerForm: React.FC = () => {
     }, [isNew]);
 
     const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+    const [isConfirmPopUpOpen, setIsConfirmPopUpOpen] = useState(false);
 
     return (
         <div className='customer-form'>
@@ -62,10 +64,13 @@ const CustomerForm: React.FC = () => {
                     <Button type="submit" variant="primary">Save</Button>
                 </div>
             </form>
+            <div className="actions">
+                <Button variant="primary" type="button" onClick={() => setIsPopUpOpen(true)}>Add new measurement</Button>
+                <MeasurementPopUp isPopUpOpen={isPopUpOpen} setIsPopUpOpen={setIsPopUpOpen} />
+                <Button variant="primary" type="button" onClick={() => setIsConfirmPopUpOpen(true)} >Show...</Button>
+                <ConfirmPopUp isPopUpOpen={isConfirmPopUpOpen} setIsPopUpOpen={setIsConfirmPopUpOpen} purpose='confirmation' text="Select the type of job you would like to see" />
+            </div>
             <MeasurementsTable data={measurementInfo} />
-            <Button variant="primary" type="button" onClick={() => setIsPopUpOpen(true)}>Add new measurement</Button>
-            <MeasurementPopUp isPopUpOpen={isPopUpOpen} setIsPopUpOpen={setIsPopUpOpen} />
-            <Button variant="primary" type="button" >Show...</Button>
         </div>
     );
 };

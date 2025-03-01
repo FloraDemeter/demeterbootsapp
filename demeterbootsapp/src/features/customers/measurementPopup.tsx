@@ -12,7 +12,6 @@ interface MeasurementPopUpProps {
 const MeasurementPopUp: React.FC<MeasurementPopUpProps> = ({isPopUpOpen, setIsPopUpOpen}) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("Done");
         setIsPopUpOpen(false);
     }
     
@@ -34,8 +33,10 @@ const MeasurementPopUp: React.FC<MeasurementPopUpProps> = ({isPopUpOpen, setIsPo
                     <Textfield label="Calf Height" />
                     <Textfield label="20cm Mark" />
                 </div>
-                <Textarea label="Notes" />
-                <Button type="submit" variant="primary">Save</Button>
+                <div className="full-width">
+                    <Textarea label="Notes" />
+                    <Button type="submit" variant="primary">Save</Button>
+                </div>
             </form>
         </PopUp>
     )

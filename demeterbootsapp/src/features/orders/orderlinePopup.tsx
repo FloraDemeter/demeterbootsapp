@@ -14,7 +14,6 @@ interface OrderLinePopUpProps {
 const OrderLinePopUp: React.FC<OrderLinePopUpProps> = ({isPopUpOpen, setIsPopUpOpen, isAdd}) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("Done");
         setIsPopUpOpen(false);
     }
 
@@ -41,15 +40,15 @@ const OrderLinePopUp: React.FC<OrderLinePopUpProps> = ({isPopUpOpen, setIsPopUpO
                     <Textfield label="Price" placeholder='' /> 
                     <DropDown label="Product Type" options={dropdownOptions}  selectedValue={selectedProductType} onChange={setSelectedProductType}/>
                     <DropDown label="Leather" options={dropdownOptions}  selectedValue={selectedLeather} onChange={setSelectedLeather}/>
+                    <DropDown label="Zipper/Elastic?" options={dropdownOptions}  selectedValue={selectedZipperElastic} onChange={setSelectedZipperElastic}/>
                 </div>
                 <div className="column-right">
-                   <DropDown label="Toe Style" options={dropdownOptions}  selectedValue={selectedToeStyle} onChange={setSelectedToeStyle}/> {/*//visibility should depend on the product type */}
-                   <DropDown label="Holes" options={dropdownOptions}  selectedValue={selectedHoles} onChange={setSelectedHoles}/> {/*visibility should depend on the product type */}
-                   <DropDown label="Zipper/Elastic?" options={dropdownOptions}  selectedValue={selectedZipperElastic} onChange={setSelectedZipperElastic}/>
-                   <DropDown label="Top Style" options={dropdownOptions}  selectedValue={selectedTopStyle} onChange={setSelectedTopStyle}/>
-                   <DropDown label="Top Leather" options={dropdownOptions}  selectedValue={selectedTopLeather} onChange={setSelectedTopLeather}/>
+                    <DropDown label="Toe Style" options={dropdownOptions}  selectedValue={selectedToeStyle} onChange={setSelectedToeStyle}/> {/*//visibility should depend on the product type */}
+                    <DropDown label="Holes" options={dropdownOptions}  selectedValue={selectedHoles} onChange={setSelectedHoles}/> {/*visibility should depend on the product type */}
+                    <DropDown label="Top Style" options={dropdownOptions}  selectedValue={selectedTopStyle} onChange={setSelectedTopStyle}/>
+                    <DropDown label="Top Leather" options={dropdownOptions}  selectedValue={selectedTopLeather} onChange={setSelectedTopLeather}/>
+                    <Button type="submit" variant="primary">Save</Button>
                 </div>
-                <Button type="submit" variant="primary">Save</Button>
             </form>
         </PopUp>
     )

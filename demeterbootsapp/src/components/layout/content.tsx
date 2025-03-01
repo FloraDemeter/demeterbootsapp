@@ -26,15 +26,14 @@ const Content: React.FC<ContentProps> = ({content, data}) => {
     const viewParam = searchParams.has("view");
     const viewID = searchParams.get("view");
 
-    if (viewParam && content === "jobs") {
+    if (viewParam && (content === "jobs" || content === "stock")) {
         return <Navigate to="/landing" replace/>
     }
 
     if (viewID === 'new' && (content === "jobs" || content === 'invoice')) {
         return <Navigate to="/landing" replace/>
     }
-    console.log(viewParam, content);
-    console.log(!viewParam && (content !== 'jobs' && content !== 'invoice'));
+    
     return (
         <div className="content">
             <div className="content-header">

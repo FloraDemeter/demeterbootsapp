@@ -14,7 +14,6 @@ interface RepairLinePopUpProps {
 const RepairLinePopUp: React.FC<RepairLinePopUpProps> = ({isPopUpOpen, setIsPopUpOpen, isAdd}) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("Done");
         setIsPopUpOpen(false);
     }
 
@@ -40,7 +39,9 @@ const RepairLinePopUp: React.FC<RepairLinePopUpProps> = ({isPopUpOpen, setIsPopU
                 <DropDown label="Product Type" options={dropdownOptions}  selectedValue={selectedProductType} onChange={setSelectedProductType}/>
                    <DropDown label="Repair Category" options={dropdownOptions} selectedValue={selectedRepairCat} onChange={setSelectedRepairCat} />
                 </div>
-                <Button type="submit" variant="primary">Save</Button>
+                <div className='full-width'>
+                    <Button type="submit" variant="primary">Save</Button>
+                </div>
             </form>
         </PopUp>
     )
