@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://plugins.gradle.org/m2/' }
     }
     resolutionStrategy {
         eachPlugin {
@@ -13,3 +13,4 @@ pluginManagement {
 }
 
 rootProject.name = 'demeterboots'
+include 'demeterboots'
