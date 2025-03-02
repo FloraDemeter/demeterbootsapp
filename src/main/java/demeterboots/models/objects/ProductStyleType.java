@@ -89,17 +89,27 @@ public class ProductStyleType {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<ProductStyleType> getAllProductTypes() throws ProductStyleTypeException {
+    public static List<ProductStyleType> getAllProductTypes() throws ProductStyleTypeException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final ProductStyleType getProductTypeDetails(Integer id) throws ProductStyleTypeException {
+    public final static ProductStyleType getProductTypeDetails(Integer id) throws ProductStyleTypeException {
         List<ProductStyleType> prodTypes = Details(id);
         if (!prodTypes.isEmpty()) {
             return prodTypes.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteProductStyleType() throws ProductStyleTypeException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitProductStyleType() throws ProductStyleTypeException {
+        Commit();
     }
 
 //--------------------------------------------------------
@@ -108,10 +118,10 @@ public class ProductStyleType {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<ProductStyleType> Details(Integer id) throws ProductStyleTypeException {
+    private static List<ProductStyleType> Details(Integer id) throws ProductStyleTypeException {
         List<ProductStyleType> prodTypes = new ArrayList<>();
         try { PreparedStatement statement = connection.prepareStatement(detailsFunction);
-            statement.setInt(1, id);
+            statement.setInt(1, id == 0 ? null : id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     ProductStyleType prodtype = new ProductStyleType();
@@ -130,7 +140,7 @@ public class ProductStyleType {
         return prodTypes;
     }
 
-    public void Delete() throws ProductStyleTypeException {
+    private void Delete() throws ProductStyleTypeException {
         if (id == null) {
             return;
         }
@@ -142,7 +152,7 @@ public class ProductStyleType {
         }
     }
 
-    public void Commit() throws ProductStyleTypeException {
+    private void Commit() throws ProductStyleTypeException {
         try { PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setInt(1, id);
             statement.setString(2, description);

@@ -96,17 +96,27 @@ public class RepairCategory {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<RepairCategory> getAllRepairCategory() throws RepairCategoryException {
+    public static List<RepairCategory> getAllRepairCategory() throws RepairCategoryException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final RepairCategory getRepairCategoryDetails(Integer id) throws RepairCategoryException {
+    public final static RepairCategory getRepairCategoryDetails(Integer id) throws RepairCategoryException {
         List<RepairCategory> repairCats = Details(id);
         if (!repairCats.isEmpty()) {
             return repairCats.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteRepairCategory() throws RepairCategoryException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitRepairCategory() throws RepairCategoryException {
+        Commit();
     }
 
 //--------------------------------------------------------
@@ -115,10 +125,10 @@ public class RepairCategory {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<RepairCategory> Details(Integer id) throws RepairCategoryException {
+    private static List<RepairCategory> Details(Integer id) throws RepairCategoryException {
         List<RepairCategory> repairCats = new ArrayList<>();
         try { PreparedStatement statement = connection.prepareStatement(detailsFunction);
-            statement.setInt(1, id);
+            statement.setInt(1, id == 0 ? null : id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     RepairCategory repairCat = new RepairCategory();
@@ -139,7 +149,7 @@ public class RepairCategory {
         return repairCats;
     }
 
-    public void Delete() throws RepairCategoryException {
+    private void Delete() throws RepairCategoryException {
         if (id == null) {
             return;
         }
@@ -151,7 +161,7 @@ public class RepairCategory {
         }
     }
 
-    public void Commit() throws RepairCategoryException {
+    private void Commit() throws RepairCategoryException {
         try { PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setInt(1, id);
             statement.setInt(2, productTypeId);

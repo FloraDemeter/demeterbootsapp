@@ -93,17 +93,27 @@ public class ProductStyle {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<ProductStyle> getAllProductStyles() throws ProductStyleException {
+    public static List<ProductStyle> getAllProductStyles() throws ProductStyleException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final ProductStyle getProductStyleDetails(Integer id) throws ProductStyleException {
+    public final static ProductStyle getProductStyleDetails(Integer id) throws ProductStyleException {
         List<ProductStyle> prodStyles = Details(id);
         if (!prodStyles.isEmpty()) {
             return prodStyles.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteProductStyle() throws ProductStyleException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitProductStyle() throws ProductStyleException {
+        Commit();
     }
 
 //--------------------------------------------------------
@@ -112,16 +122,16 @@ public class ProductStyle {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<ProductStyle> Details(Integer id) throws ProductStyleException {
+    private static List<ProductStyle> Details(Integer id) throws ProductStyleException {
         List<ProductStyle> prodStyles = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
-            statement.setInt(1, id);
+            statement.setInt(1, id == 0 ? null : id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     ProductStyle style = new ProductStyle();
-                    this.id = resultSet.getInt("id");
-                    this.productStyleTypeID = resultSet.getInt("productStyleTypeID");
-                    this.description = resultSet.getString("description");
+                    style.id = resultSet.getInt("id");
+                    style.productStyleTypeID = resultSet.getInt("productStyleTypeID");
+                    style.description = resultSet.getString("description");
                     prodStyles.add(style);
                 }
             }
@@ -136,7 +146,7 @@ public class ProductStyle {
         return prodStyles;
     }
 
-    public void Delete() throws ProductStyleException{
+    private void Delete() throws ProductStyleException{
         if (id == null) {
             return;
         }
@@ -149,7 +159,7 @@ public class ProductStyle {
         }
     }
 
-    public void Commit() throws ProductStyleException {
+    private void Commit() throws ProductStyleException {
         try(PreparedStatement statement = connection.prepareStatement(commitFunction)) {
             statement.setInt(1, id);
             statement.setInt(2, productStyleTypeID);

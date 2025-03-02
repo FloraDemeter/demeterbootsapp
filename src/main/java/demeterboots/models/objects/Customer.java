@@ -101,20 +101,30 @@ public class Customer {
         return getFirstName() + " " + getLastName();
     }
     @JsonIgnore
-    public List<Customer> getAllCustomers() throws CustomerException {
+    public static List<Customer> getAllCustomers() throws CustomerException {
         return Details("");
     }
     @JsonIgnore
-    public Customer getCustomer(String id) throws CustomerException {
+    public static Customer getCustomer(String id) throws CustomerException {
         return new Customer(id);
     }
     @JsonIgnore
-    private Customer getCustomerDetails(String id) throws CustomerException {
+    private static Customer getCustomerDetails(String id) throws CustomerException {
         List<Customer> customers = Details(id);
         if (!customers.isEmpty()) {
             return customers.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteCustomer() throws CustomerException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitCustomer() throws CustomerException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -131,14 +141,14 @@ public class Customer {
 //region Database methods
 //--------------------------------------------------------
 
-    public List<Customer> Details(String id) throws CustomerException {
+    private static List<Customer> Details(String id) throws CustomerException {
         List<Customer> customers = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
+            stmt.setString(1, id.isEmpty() ? null : id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Customer customer = new Customer();
-                    customer.id = rs.getString("p_id");
+                    customer.id = rs.getString("id");
                     customer.firstName = rs.getString("firstname");
                     customer.lastName = rs.getString("lastname");
                     customer.street = rs.getString("street");
@@ -159,7 +169,7 @@ public class Customer {
         return customers;
     }
 
-    public void Delete() throws CustomerException {
+    private void Delete() throws CustomerException {
         if (id == null) {
             return;
         }
@@ -172,7 +182,7 @@ public class Customer {
         }
     }
 
-    public void Commit() throws CustomerException {
+    private void Commit() throws CustomerException {
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, firstName);

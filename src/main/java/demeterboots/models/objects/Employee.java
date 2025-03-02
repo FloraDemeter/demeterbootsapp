@@ -139,19 +139,19 @@ public class Employee {
         return getFirstName() + " " + getLastName();
     }
     @JsonIgnore
-    public List<Employee> getAllEmployees() throws EmployeeException {
+    public static List<Employee> getAllEmployees() throws EmployeeException {
         return Details("","");
     }
     @JsonIgnore
-    public Employee getEmployeeById(String id) throws EmployeeException {
+    public static Employee getEmployeeById(String id) throws EmployeeException {
         return new Employee(id, false);
     }
     @JsonIgnore
-    public Employee getEmployeeByUserName(String username) throws EmployeeException {
+    public static Employee getEmployeeByUserName(String username) throws EmployeeException {
         return new Employee(username, true);
     }
     @JsonIgnore
-    public final Employee getEmployeeDetails(String id, String username) throws EmployeeException {
+    public static final Employee getEmployeeDetails(String id, String username) throws EmployeeException {
         List<Employee> employees = Details(id, username);
         if (!employees.isEmpty()) {
             return employees.get(0);
@@ -159,7 +159,7 @@ public class Employee {
         return null;
     }
     @JsonIgnore
-    public Boolean tryLoginUser(String username, String password) throws EmployeeException {
+    public static Boolean tryLoginUser(String username, String password) throws EmployeeException {
         dataContext.currentUser = getEmployeeByUserName(username);
         if (dataContext.currentUser == null) {
             return false;
@@ -167,6 +167,16 @@ public class Employee {
         String encryptedPassword = passwordHashing.encryptPassword(password);
 
         return dataContext.currentUser.password.equals(encryptedPassword);
+    }
+
+    @JsonIgnore
+    public void deleteEmployee() throws EmployeeException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitEmployee() throws EmployeeException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -183,11 +193,11 @@ public class Employee {
 //region Database methods
 //--------------------------------------------------------
     
-    public List<Employee> Details(String id, String username) throws EmployeeException {
+    private static List<Employee> Details(String id, String username) throws EmployeeException {
         List<Employee> employees = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
-            stmt.setString(2, username);
+            stmt.setString(1, id.isEmpty() ? null : id);
+            stmt.setString(2, username.isEmpty() ? null : username);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Employee employee = new Employee();
@@ -223,7 +233,7 @@ public class Employee {
         return employees;
     }
 
-    public void Delete() throws EmployeeException {
+    private void Delete() throws EmployeeException {
         if (id == null) {
             return;
         }
@@ -236,7 +246,7 @@ public class Employee {
         }
     }
 
-    public void Commit() throws EmployeeException {
+    private void Commit() throws EmployeeException {
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, firstName);

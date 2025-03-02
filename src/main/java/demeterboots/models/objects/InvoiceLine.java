@@ -95,22 +95,32 @@ public class InvoiceLine {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<InvoiceLine> getAllInvoiceLines() throws InvoiceLineException {
+    public static List<InvoiceLine> getAllInvoiceLines() throws InvoiceLineException {
         return Details("", "");
     }
 
     @JsonIgnore
-    public List<InvoiceLine> getAllInvoiceLinesByInvoiceID(String invoiceID) throws InvoiceLineException {
+    public static List<InvoiceLine> getAllInvoiceLinesByInvoiceID(String invoiceID) throws InvoiceLineException {
         return Details("", invoiceID);
     }
 
     @JsonIgnore
-    public final InvoiceLine getInvoiceLineDetails(String id) throws InvoiceLineException {
+    public final static InvoiceLine getInvoiceLineDetails(String id) throws InvoiceLineException {
         List<InvoiceLine> invoiceLines = Details(id, "");
         if (!invoiceLines.isEmpty()) {
             return invoiceLines.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteInvoiceLine() throws InvoiceLineException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitInvoiceLine() throws InvoiceLineException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -128,11 +138,11 @@ public class InvoiceLine {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<InvoiceLine> Details(String invoiceLineId, String invoiceId) throws InvoiceLineException {
+    private static List<InvoiceLine> Details(String invoiceLineId, String invoiceId) throws InvoiceLineException {
         List<InvoiceLine> invoiceLines = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, invoiceLineId);
-            stmt.setString(2, invoiceId);
+            stmt.setString(1, invoiceLineId.isEmpty() ? null : invoiceLineId);
+            stmt.setString(2, invoiceId.isEmpty() ? null : invoiceId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     InvoiceLine invoiceLine = new InvoiceLine();
@@ -157,7 +167,7 @@ public class InvoiceLine {
         return invoiceLines;
     }
 
-    public void Delete() throws InvoiceLineException {
+    private void Delete() throws InvoiceLineException {
         try(PreparedStatement stmt = connection.prepareStatement(deleteFunction)) {
             stmt.setString(1, id);
             stmt.execute();
@@ -166,7 +176,7 @@ public class InvoiceLine {
         }
     }
 
-    public void Commit() throws InvoiceLineException {
+    private void Commit() throws InvoiceLineException {
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, invoiceID);

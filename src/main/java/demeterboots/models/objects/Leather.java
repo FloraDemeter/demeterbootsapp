@@ -94,18 +94,28 @@ public class Leather {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Leather> getAllLeathers() throws LeatherException {
+    public static List<Leather> getAllLeathers() throws LeatherException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final Leather getLeatherDetails(Integer id) throws LeatherException {
+    public static final Leather getLeatherDetails(Integer id) throws LeatherException {
         List<Leather> leathers = Details(id);
         if (!leathers.isEmpty()) {
             return leathers.get(0);
         }
 
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteLeather() throws LeatherException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitLeather() throws LeatherException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -123,10 +133,10 @@ public class Leather {
 //region Database Methods
 //--------------------------------------------------------
     
-    public final List<Leather> Details(Integer id) throws LeatherException {
+    private static List<Leather> Details(Integer id) throws LeatherException {
         List<Leather> leathers = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
-            statement.setInt(1, id);
+            statement.setInt(1, id == 0 ? null : id);
             try(ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Leather leather = new Leather();
@@ -149,7 +159,7 @@ public class Leather {
         return leathers;
     }
 
-    public void Delete() throws LeatherException{
+    private void Delete() throws LeatherException{
         try(PreparedStatement statement = connection.prepareStatement(deleteFunction)) {
             statement.setInt(1, id);
             statement.execute();
@@ -158,7 +168,7 @@ public class Leather {
         }
     }
 
-    public void Commit() throws LeatherException{
+    private void Commit() throws LeatherException{
         try(PreparedStatement statement = connection.prepareStatement(commitFunction)) {
             statement.setInt(1, id);
             statement.setString(2, colour);

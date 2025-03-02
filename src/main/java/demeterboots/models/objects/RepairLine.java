@@ -93,22 +93,32 @@ public class RepairLine {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<RepairLine> getAllRepairLines() throws RepairLineException {
+    public static List<RepairLine> getAllRepairLines() throws RepairLineException {
         return Details("", "");
     }
 
     @JsonIgnore
-    public List<RepairLine> getAllRepairLinesForRepair(String repairId) throws RepairLineException {
-        return Details("", repairID);
+    public static List<RepairLine> getAllRepairLinesForRepair(String repairId) throws RepairLineException {
+        return Details("", repairId);
     }
 
     @JsonIgnore
-    public final RepairLine getRepairLineDetails(String id) throws RepairLineException {
+    public final static RepairLine getRepairLineDetails(String id) throws RepairLineException {
         List<RepairLine> repairLines = Details(id, "");
         if (!repairLines.isEmpty()) {
             return repairLines.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteRepairLine() throws RepairLineException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitRepairLine() throws RepairLineException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -125,19 +135,19 @@ public class RepairLine {
 //region Database methods
 //--------------------------------------------------------
 
-    public List<RepairLine> Details(String id, String repairID) throws RepairLineException{
+    private static List<RepairLine> Details(String id, String repairID) throws RepairLineException{
         List<RepairLine> repairLines = new ArrayList<>();
         try {PreparedStatement statement = connection.prepareStatement(detailsFunction);
-            statement.setString(1, id);
-            statement.setString(2, repairID);
+            statement.setString(1, id.isEmpty() ? null : id);
+            statement.setString(2, repairID.isEmpty() ? null : id);
             try(ResultSet reader = statement.executeQuery()) {
                 while (reader.next()) {
                     RepairLine repairline = new RepairLine();
-                    this.id = reader.getString("id");
-                    this.repairID = reader.getString("repairID");
-                    this.repairCategoryID = reader.getInt("repairCategoryID");
-                    this.price = reader.getDouble("price");
-                    this.notes = reader.getString("notes");
+                    repairline.id = reader.getString("id");
+                    repairline.repairID = reader.getString("repairID");
+                    repairline.repairCategoryID = reader.getInt("repairCategoryID");
+                    repairline.price = reader.getDouble("price");
+                    repairline.notes = reader.getString("notes");
                     repairLines.add(repairline);
                 }
             }
@@ -155,7 +165,7 @@ public class RepairLine {
         return repairLines;
     }
 
-    public void Delete() throws RepairLineException {
+    private void Delete() throws RepairLineException {
         try {PreparedStatement statement = connection.prepareStatement(deleteFunction);
             statement.setString(1, id);
             statement.execute();
@@ -164,7 +174,7 @@ public class RepairLine {
         }
     }
 
-    public void Commit() throws RepairLineException{
+    private void Commit() throws RepairLineException{
         try {PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setString(1, id);
             statement.setString(2, repairID);

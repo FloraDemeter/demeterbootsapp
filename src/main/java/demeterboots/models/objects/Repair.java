@@ -106,23 +106,33 @@ public class Repair {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Repair> getAllRepairs() throws RepairException {
+    public static List<Repair> getAllRepairs() throws RepairException {
         return Details("","");
     }
 
     @JsonIgnore
-    public List<Repair> getAllRepairsForCustomer(String customerID) throws RepairException {
+    public static List<Repair> getAllRepairsForCustomer(String customerID) throws RepairException {
         return Details("", customerID);
     }
 
     @JsonIgnore
-    public final Repair getRepairDetails(String id) throws RepairException {
+    public final static Repair getRepairDetails(String id) throws RepairException {
         List<Repair> repairs = Details(id, "");
         if (!repairs.isEmpty()) {
             return repairs.get(0);
         }
 
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteRepair() throws RepairException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitRepair() throws RepairException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -139,10 +149,10 @@ public class Repair {
 //region Database methods
 //--------------------------------------------------------
 
-    public final List<Repair> Details(String id, String customerID) throws RepairException {
+    private static List<Repair> Details(String id, String customerID) throws RepairException {
         List<Repair> repairs = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
+            stmt.setString(1, id.isEmpty() ? null : id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Repair repair = new Repair();
@@ -172,7 +182,7 @@ public class Repair {
         return repairs;
     }
 
-    public void Delete() throws RepairException {
+    private void Delete() throws RepairException {
         if (id == null) {
             return;
         }
@@ -185,7 +195,7 @@ public class Repair {
         }
     }
 
-    public void Commit() throws RepairException {
+    private void Commit() throws RepairException {
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, customerID);

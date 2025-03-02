@@ -107,22 +107,32 @@ public class Order {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Order> getAllOrders() throws OrderException {
+    public static List<Order> getAllOrders() throws OrderException {
         return Details("","");
     }
 
     @JsonIgnore
-    public List<Order> getAllOrdersForCustomer(String customerID) throws OrderException {
+    public static List<Order> getAllOrdersForCustomer(String customerID) throws OrderException {
         return Details("", customerID);
     }
 
     @JsonIgnore
-    public final Order getOrderDetails(String id) throws OrderException {
+    public final static Order getOrderDetails(String id) throws OrderException {
         List<Order> orders = Details(id,"");
         if (!orders.isEmpty()) {
             return orders.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteOrder() throws OrderException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitOrder() throws OrderException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -139,22 +149,22 @@ public class Order {
 //region Database methods
 //--------------------------------------------------------
 
-    public List<Order> Details(String id, String customerID) throws OrderException{
+    private static List<Order> Details(String id, String customerID) throws OrderException{
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
-            stmt.setString(2, customerID);
+            stmt.setString(1, id.isEmpty() ? null : id);
+            stmt.setString(2, customerID.isEmpty() ? null : id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Order order = new Order();
-                    this.id = rs.getString("id");
-                    this.customerID = rs.getString("customerID");
-                    this.orderDate = rs.getDate("orderDate");
-                    this.predictedFinishDate = rs.getDate("predictedFinishDate");
-                    this.location = rs.getString("location");
-                    this.total = rs.getDouble("total");
-                    this.isWarrantyAccepted = rs.getString("isWarrantyAccepted");
-                    this.status = rs.getString("status");
+                    order.id = rs.getString("id");
+                    order.customerID = rs.getString("customerID");
+                    order.orderDate = rs.getDate("orderDate");
+                    order.predictedFinishDate = rs.getDate("predictedFinishDate");
+                    order.location = rs.getString("location");
+                    order.total = rs.getDouble("total");
+                    order.isWarrantyAccepted = rs.getString("isWarrantyAccepted");
+                    order.status = rs.getString("status");
                     orders.add(order);
                 }
             }
@@ -170,7 +180,7 @@ public class Order {
         return orders;
     }
 
-    public void Delete() throws OrderException {
+    private void Delete() throws OrderException {
         if (id == null) {
             return;
         }
@@ -183,7 +193,7 @@ public class Order {
         }
     }
 
-    public void Commit() throws OrderException{
+    private void Commit() throws OrderException{
         try (PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, this.id);
             stmt.setString(2, this.customerID);

@@ -135,22 +135,32 @@ public class Measurements {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Measurements> getAllMeasurements() throws MeasurementsException {
+    public static List<Measurements> getAllMeasurements() throws MeasurementsException {
         return Details("", "");
     }
 
     @JsonIgnore
-    public List<Measurements> getAllMeasurementsByCustomer(String id) throws MeasurementsException {
+    public static List<Measurements> getAllMeasurementsByCustomer(String id) throws MeasurementsException {
         return Details("", id);
     }
 
     @JsonIgnore
-    public final Measurements getMeasurementsDetails(String id, String customerID) throws MeasurementsException {
+    public final static Measurements getMeasurementsDetails(String id, String customerID) throws MeasurementsException {
         List<Measurements> measList = Details(id, customerID);
         if (measList.isEmpty()) {
             return measList.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteMeasurement() throws MeasurementsException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitMeasurement() throws MeasurementsException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -167,29 +177,29 @@ public class Measurements {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<Measurements> Details(String id, String customerId) throws MeasurementsException{
+    private static List<Measurements> Details(String id, String customerId) throws MeasurementsException{
         List<Measurements> measList = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
-            statement.setString(1, id);
-            statement.setString(2, customerId);
+            statement.setString(1, id.isEmpty() ? null : id);
+            statement.setString(2, customerId.isEmpty() ? null : customerId);
             try(ResultSet results = statement.executeQuery()) {
                 while (results.next()) {
                     Measurements meas = new Measurements();
-                    this.id = results.getString("id");
-                    this.customerID = results.getString("CustomerID");
-                    this.date = results.getDate("Date");
-                    this.notes = results.getString("Notes");
-                    this.feet = results.getDouble("Feet");
-                    this.bunion = results.getDouble("Bunion");
-                    this.highPoint = results.getDouble("HighPoint");
-                    this.heel = results.getDouble("Heel");
-                    this.ankle = results.getDouble("Ankle");
-                    this.calf = results.getDouble("Calf");
-                    this.underKnee = results.getDouble("UnderKnee");
-                    this.height = results.getDouble("Height");
-                    this.calfHeight = results.getDouble("CalfHeight");
-                    this.tMark = results.getDouble("TMark");
-                    this.imagePath = results.getString("ImagePath");
+                    meas.id = results.getString("id");
+                    meas.customerID = results.getString("CustomerID");
+                    meas.date = results.getDate("Date");
+                    meas.notes = results.getString("Notes");
+                    meas.feet = results.getDouble("Feet");
+                    meas.bunion = results.getDouble("Bunion");
+                    meas.highPoint = results.getDouble("HighPoint");
+                    meas.heel = results.getDouble("Heel");
+                    meas.ankle = results.getDouble("Ankle");
+                    meas.calf = results.getDouble("Calf");
+                    meas.underKnee = results.getDouble("UnderKnee");
+                    meas.height = results.getDouble("Height");
+                    meas.calfHeight = results.getDouble("CalfHeight");
+                    meas.tMark = results.getDouble("TMark");
+                    meas.imagePath = results.getString("ImagePath");
                     measList.add(meas);
                 }
             }
@@ -208,7 +218,7 @@ public class Measurements {
         return measList;
     }
 
-    public void Delete() throws MeasurementsException{
+    private void Delete() throws MeasurementsException{
         if (id == null) {
             return;
         }
@@ -221,7 +231,7 @@ public class Measurements {
         }
     }
 
-    public void Commit() throws MeasurementsException{
+    private void Commit() throws MeasurementsException{
         try(PreparedStatement statement = connection.prepareStatement(commitFunction)) {
             statement.setString(1, id);
             statement.setString(2, customerID);

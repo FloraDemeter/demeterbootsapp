@@ -92,17 +92,27 @@ public class ProductType {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<ProductType> getAllProductTypes() throws ProductTypeException {
+    public static List<ProductType> getAllProductTypes() throws ProductTypeException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final ProductType getProductTypeDetails(Integer id) throws ProductTypeException {
+    public final static ProductType getProductTypeDetails(Integer id) throws ProductTypeException {
         List<ProductType> prodTypes = Details(id);
         if (!prodTypes.isEmpty()) {
             return prodTypes.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteProductType() throws ProductTypeException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitProductType() throws ProductTypeException {
+        Commit();
     }
 
 //--------------------------------------------------------
@@ -111,10 +121,10 @@ public class ProductType {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<ProductType> Details(Integer id) throws ProductTypeException {
+    private static List<ProductType> Details(Integer id) throws ProductTypeException {
         List<ProductType> prodTypes = new ArrayList<>();
         try { PreparedStatement statement = connection.prepareStatement(detailsFunction);
-            statement.setInt(1, id);
+            statement.setInt(1, id == 0 ? null : id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     ProductType prodtype = new ProductType();
@@ -134,7 +144,7 @@ public class ProductType {
         return prodTypes;
     }
 
-    public void Delete() throws ProductTypeException {
+    private void Delete() throws ProductTypeException {
         if (id == null) {
             return;
         }
@@ -146,7 +156,7 @@ public class ProductType {
         }
     }
 
-    public void Commit() throws ProductTypeException {
+    private void Commit() throws ProductTypeException {
         try { PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setInt(1, id);
             statement.setString(2, description);

@@ -94,23 +94,33 @@ public class Job {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Job> getAllJobs() throws JobException{
+    public static List<Job> getAllJobs() throws JobException{
         return Details("","");
     }
 
     @JsonIgnore
-    public List<Job> getJobsByEmployeeID(String employeeID) throws JobException{
+    public static List<Job> getJobsByEmployeeID(String employeeID) throws JobException{
         return Details( "", employeeID);
     }
 
     @JsonIgnore
-    public final Job getJobByID(String id) throws JobException{
+    public final static Job getJobByID(String id) throws JobException{
         List<Job> jobs = Details(id, "");
         if (!jobs.isEmpty()) {
             return jobs.get(0);
         }
 
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteJob() throws JobException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitJob() throws JobException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -127,11 +137,11 @@ public class Job {
 //region Database Mehods
 //--------------------------------------------------------
 
-    public List<Job> Details(String id, String employeeID) throws JobException{
+    private static List<Job> Details(String id, String employeeID) throws JobException{
         List<Job> jobs = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
-            stmt.setString(2, employeeID);
+            stmt.setString(1, id.isEmpty() ? null : id);
+            stmt.setString(2, employeeID.isEmpty() ? null : employeeID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Job job = new Job();
@@ -158,7 +168,7 @@ public class Job {
         return jobs;
     }
 
-    public void Delete() throws JobException{
+    private void Delete() throws JobException{
         if (id == null) {
             return;
         }
@@ -171,7 +181,7 @@ public class Job {
         }
     }
 
-    public void Commit() throws JobException{
+    private void Commit() throws JobException{
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, employeeID);

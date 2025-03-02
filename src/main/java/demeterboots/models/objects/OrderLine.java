@@ -13,7 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
-import demeterboots.models.util.exceptions.OrderLineException;;
+import demeterboots.models.util.exceptions.OrderLineException;
+;
 
 public class OrderLine {
 
@@ -111,22 +112,32 @@ public class OrderLine {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<OrderLine> getAllOrderLines() throws OrderLineException {
+    public static List<OrderLine> getAllOrderLines() throws OrderLineException {
         return Details("","");
     }
 
     @JsonIgnore
-    public List<OrderLine> getAllOrderLinesPerOrder(String orderId) throws OrderLineException {
+    public static List<OrderLine> getAllOrderLinesPerOrder(String orderId) throws OrderLineException {
         return Details("", orderId);
     }
 
     @JsonIgnore
-    public final OrderLine getOrderLineDetails(String id) throws OrderLineException {
+    public final static OrderLine getOrderLineDetails(String id) throws OrderLineException {
         List<OrderLine> lines = Details(id, "");
         if (!lines.isEmpty()) {
             return lines.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteOrderLine() throws OrderLineException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitOrderLine() throws OrderLineException {
+        Commit();
     }
 
 //--------------------------------------------------------
@@ -135,10 +146,10 @@ public class OrderLine {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<OrderLine> Details(String id, String orderID) throws OrderLineException {
+    private static List<OrderLine> Details(String id, String orderID) throws OrderLineException {
         List<OrderLine> lines = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, id);
+            stmt.setString(1, id.isEmpty() ? null : id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     OrderLine line = new OrderLine();
@@ -165,7 +176,7 @@ public class OrderLine {
         return lines;
     }
 
-    public void Delete() throws OrderLineException {
+    private void Delete() throws OrderLineException {
         if (id == null) {
             return;
         }
@@ -178,7 +189,7 @@ public class OrderLine {
         }
     }
 
-    public void Commit() throws OrderLineException {
+    private void Commit() throws OrderLineException {
         try (CallableStatement stmt = connection.prepareCall(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, orderId);

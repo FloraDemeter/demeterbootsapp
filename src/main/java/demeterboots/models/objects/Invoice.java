@@ -108,27 +108,37 @@ public class Invoice {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<Invoice> getAllInvoices() throws InvoiceException{
+    public static List<Invoice> getAllInvoices() throws InvoiceException{
         return Details("","");
     }
 
     @JsonIgnore
-    public List<Invoice> getAllInvoicesByCustomerID(String customerID) throws InvoiceException{
+    public static List<Invoice> getAllInvoicesByCustomerID(String customerID) throws InvoiceException{
         return Details("", customerID);
     }
 
     @JsonIgnore
-    public Invoice getInvoice(String invoiceID) throws InvoiceException{
+    public static Invoice getInvoice(String invoiceID) throws InvoiceException{
         return new Invoice (invoiceID);
     }
 
     @JsonIgnore
-    public final Invoice getInvoiceDetails(String invoiceID, String customerID) throws InvoiceException{
+    public final static Invoice getInvoiceDetails(String invoiceID, String customerID) throws InvoiceException{
         List<Invoice> invoices = Details(invoiceID, customerID);
         if (!invoices.isEmpty()) {
             return invoices.get(0);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public void deleteInvoice() throws InvoiceException {
+        Delete();
+    }
+
+    @JsonIgnore
+    public void commitInvoice() throws InvoiceException {
+        Commit();
     }
 
     private static DataContext getDataContext() throws DatabaseException {
@@ -145,22 +155,22 @@ public class Invoice {
 //region Database methods
 //--------------------------------------------------------
 
-    public List<Invoice> Details(String invoiceId, String customerId) throws InvoiceException{
+    private static List<Invoice> Details(String invoiceId, String customerId) throws InvoiceException{
         List<Invoice> invoices = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
-            stmt.setString(1, invoiceId);
-            stmt.setString(2, customerId);
+            stmt.setString(1, invoiceId.isEmpty() ? null : invoiceId);
+            stmt.setString(2, customerId.isEmpty() ? null : customerId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Invoice invoice = new Invoice();
-                    this.id = rs.getString("id");
-                    this.customerId = rs.getString("customerId");
-                    this.status = rs.getInt("status");
-                    this.paymentType = rs.getInt("paymentType");
-                    this.total = rs.getDouble("total");
-                    this.invoiceDate = rs.getDate("invoiceDate");
-                    this.paymentDate = rs.getDate("paymentDate");
-                    this.isPaid = rs.getBoolean("isPaid");
+                    invoice.id = rs.getString("id");
+                    invoice.customerId = rs.getString("customerId");
+                    invoice.status = rs.getInt("status");
+                    invoice.paymentType = rs.getInt("paymentType");
+                    invoice.total = rs.getDouble("total");
+                    invoice.invoiceDate = rs.getDate("invoiceDate");
+                    invoice.paymentDate = rs.getDate("paymentDate");
+                    invoice.isPaid = rs.getBoolean("isPaid");
                     invoices.add(invoice);
                 }
             }
@@ -179,7 +189,7 @@ public class Invoice {
         return invoices;
     }
 
-    public void Delete() throws InvoiceException{
+    private void Delete() throws InvoiceException{
         if (id == null) {
             return;
         }
@@ -192,7 +202,7 @@ public class Invoice {
         }
     }
 
-    public void Commit() throws InvoiceException{
+    private void Commit() throws InvoiceException{
         try(PreparedStatement stmt = connection.prepareStatement(commitFunction)) {
             stmt.setString(1, id);
             stmt.setString(2, customerId);
