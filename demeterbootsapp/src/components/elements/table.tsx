@@ -244,11 +244,10 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.id}</td>
+            <td>{row.firstName} {row.lastName}</td>
+            <td>{row.city}</td>
+            <td>{row.phone}</td>
         </tr>
         ))}
     </tbody>
@@ -272,11 +271,17 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.notes}</td>
+            <td>{row.feet}</td>
+            <td>{row.bunion}</td>
+            <td>{row.highPoint}</td>
+            <td>{row.heel}</td>
+            <td>{row.ankle}</td>
+            <td>{row.calf}</td>
+            <td>{row.underKnee}</td>
+            <td>{row.height}</td>
+            <td>{row.calfHeight}</td>
+            <td>{row.tMark}</td>
         </tr>
         ))}
     </tbody>
