@@ -6,20 +6,30 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.ProductStyleException;
 
 public class ProductStyle {
 
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("productStyleTypeID")
     private Integer productStyleTypeID;
+    @JsonProperty("description")
     private String description;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.ProductStyle_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.ProductStyle_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.ProductStyle_Commit(?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -29,6 +39,7 @@ public class ProductStyle {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -81,10 +92,12 @@ public class ProductStyle {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<ProductStyle> getAllProductStyles() throws ProductStyleException {
         return Details(null);
     }
 
+    @JsonIgnore
     public final ProductStyle getProductStyleDetails(Integer id) throws ProductStyleException {
         List<ProductStyle> prodStyles = Details(id);
         if (!prodStyles.isEmpty()) {

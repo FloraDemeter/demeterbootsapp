@@ -7,19 +7,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.ProductTypeException;
 
 public class ProductType {
     
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("description")
     private String description;
+    @JsonProperty("price")
+    private Double price;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.ProductType_Details(?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.ProductType_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.ProductType_Commit(?, ?)";
+    @JsonIgnore
+    private static String commitFunction  = "CALL demeterboots.ProductType_Commit(?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -29,6 +40,7 @@ public class ProductType {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -64,12 +76,14 @@ public class ProductType {
         if (prodtype != null) {
             this.id = prodtype.id;
             this.description = prodtype.description;
+            this.price = prodtype.price;
         }
     }
 
-    public ProductType(Integer id, String description) {
+    public ProductType(Integer id, String description, Double price) {
         this.id = id;
         this.description = description;
+        this.price = price;
     }
 //--------------------------------------------------------
 //endregion
@@ -77,10 +91,12 @@ public class ProductType {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<ProductType> getAllProductTypes() throws ProductTypeException {
         return Details(null);
     }
 
+    @JsonIgnore
     public final ProductType getProductTypeDetails(Integer id) throws ProductTypeException {
         List<ProductType> prodTypes = Details(id);
         if (!prodTypes.isEmpty()) {
@@ -104,6 +120,7 @@ public class ProductType {
                     ProductType prodtype = new ProductType();
                     prodtype.id = resultSet.getInt("id");
                     prodtype.description = resultSet.getString("description");
+                    prodtype.price = resultSet.getDouble("price");
                     prodTypes.add(prodtype); 
                 }
             }
@@ -133,6 +150,7 @@ public class ProductType {
         try { PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setInt(1, id);
             statement.setString(2, description);
+            statement.setDouble(3, price);
             statement.execute();
         } catch (SQLException e) {
             if (id != null) {
@@ -162,6 +180,14 @@ public class ProductType {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 //--------------------------------------------------------
 //endregion

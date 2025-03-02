@@ -7,21 +7,34 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.InvoiceLineException;
 
 public class InvoiceLine {
+
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("invoiceID")
     private String invoiceID;
+    @JsonProperty("taskID")
     private String taskID;
+    @JsonProperty("taskType")
     private String taskType;
+    @JsonProperty("total")
     private Double total;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.InvoiceLine_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.InvoiceLine_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.InvoiceLine_Commit(?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -31,6 +44,7 @@ public class InvoiceLine {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -80,14 +94,17 @@ public class InvoiceLine {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<InvoiceLine> getAllInvoiceLines() throws InvoiceLineException {
         return Details("", "");
     }
 
+    @JsonIgnore
     public List<InvoiceLine> getAllInvoiceLinesByInvoiceID(String invoiceID) throws InvoiceLineException {
         return Details("", invoiceID);
     }
 
+    @JsonIgnore
     public final InvoiceLine getInvoiceLineDetails(String id) throws InvoiceLineException {
         List<InvoiceLine> invoiceLines = Details(id, "");
         if (!invoiceLines.isEmpty()) {

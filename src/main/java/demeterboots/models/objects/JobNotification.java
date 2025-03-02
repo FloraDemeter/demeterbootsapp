@@ -7,23 +7,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.JobNotificationException;
 
 public class JobNotification {
+
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("previousEmployeeID")
     private String previousEmployeeID;
+    @JsonProperty("newEmployeeID")
     private String newEmployeeID;
+    @JsonProperty("isNotified")
     private Boolean isNotified;
+    @JsonProperty("taskID")
     private String taskID;
+    @JsonProperty("taskType")
     private String taskType;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.JobNotification_Details(?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.JobNotification_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.JobNotification_Commit(?, ?, ?, ?, ?, ?)";
+    @JsonIgnore
     private static String notNotifiedFunction  = "CALL demeterboots.JobNotification_NotNotified(?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -33,6 +48,7 @@ public class JobNotification {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -83,14 +99,17 @@ public class JobNotification {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<JobNotification> getAllJobNotifications() throws JobNotificationException {
-        return Details("");
-    }
+            return Details("");
+        }
 
+    @JsonIgnore
     public List<JobNotification> getUnnotifiedJobs(String employeeID) throws JobNotificationException {
         return NotNotified(employeeID);
     }
 
+    @JsonIgnore
     public final JobNotification getJobNotificationDetails(String id) throws JobNotificationException {
         List<JobNotification> jobNotifications = Details(id);
         if (!jobNotifications.isEmpty()) {

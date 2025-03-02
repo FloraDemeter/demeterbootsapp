@@ -86,7 +86,6 @@ CREATE TABLE demeterboots.Repair (
 CREATE TABLE demeterboots.RepairLine (
     ID VARCHAR(10) PRIMARY KEY DEFAULT demeterboots.generate_id('RL', 'demeterboots.repairline_seq', TRUE),
     RepairID VARCHAR(10) NOT NULL REFERENCES demeterboots.Repair(ID) ON DELETE CASCADE,
-    ProductTypeID INT NOT NULL REFERENCES demeterboots.ProductType(ID) ON DELETE CASCADE,
     RepairCategoryID INT NOT NULL REFERENCES demeterboots.RepairCategory(ID) ON DELETE CASCADE,
     Price NUMERIC(10,2) NOT NULL,
     Notes VARCHAR(500)
@@ -135,7 +134,8 @@ CREATE TABLE demeterboots.JobNotification (
 -- ProductType Table 
 CREATE TABLE demeterboots.ProductType (
     ID SERIAL PRIMARY KEY,
-    Description VARCHAR(100) NOT NULL
+    Description VARCHAR(100) NOT NULL,
+    Price NUMERIC(10,2) NOT NULL
 );
 
 -- ProductStyle Table 
@@ -157,6 +157,7 @@ CREATE TABLE demeterboots.RepairCategory (
     ID SERIAL PRIMARY KEY,
     ProductTypeID INT NOT NULL,
     Description VARCHAR(100) NOT NULL,
+    Price NUMERIC(10,2) NOT NULL,
     FOREIGN KEY (ProductTypeID) REFERENCES demeterboots.ProductType(ID) ON DELETE CASCADE
 );
 

@@ -8,24 +8,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.OrderLineException;;
 
 public class OrderLine {
 
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("orderId")
     private String orderId;
+    @JsonProperty("productTypeID")
     private Integer productTypeID;
+    @JsonProperty("leatherID")
     private Integer leatherID;
+    @JsonProperty("productStyle")
     private String productStyle; //this is a JSONB object
+    @JsonProperty("price")
     private Double price;
+    @JsonProperty("notes")
     private String notes;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.OrderLine_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.OrderLine_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.OrderLine_Commit(?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -35,6 +49,7 @@ public class OrderLine {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -95,14 +110,17 @@ public class OrderLine {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<OrderLine> getAllOrderLines() throws OrderLineException {
         return Details("","");
     }
 
+    @JsonIgnore
     public List<OrderLine> getAllOrderLinesPerOrder(String orderId) throws OrderLineException {
         return Details("", orderId);
     }
 
+    @JsonIgnore
     public final OrderLine getOrderLineDetails(String id) throws OrderLineException {
         List<OrderLine> lines = Details(id, "");
         if (!lines.isEmpty()) {

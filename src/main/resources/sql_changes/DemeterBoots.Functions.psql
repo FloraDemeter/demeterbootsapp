@@ -246,20 +246,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in RepairLine
-CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Commit(p_id VARCHAR, repairid VARCHAR, producttypeid INT, repaircategoryid INT, price NUMERIC, notes VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Commit(p_id VARCHAR, repairid VARCHAR, repaircategoryid INT, price NUMERIC, notes VARCHAR)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.RepairLine (RepairID, ProductTypeID, RepairCategoryID, Price, Notes) VALUES (repairid, producttypeid, repaircategoryid, price, notes);
+        INSERT INTO demeterboots.RepairLine (RepairID, RepairCategoryID, Price, Notes) VALUES (repairid, repaircategoryid, price, notes);
     ELSE
-        UPDATE demeterboots.RepairLine SET RepairID = repairid, ProductTypeID = producttypeid, RepairCategoryID = repaircategoryid, Price = price, Notes = notes WHERE ID = p_id;
+        UPDATE demeterboots.RepairLine SET RepairID = repairid, RepairCategoryID = repaircategoryid, Price = price, Notes = notes WHERE ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from RepairLine
 CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Details(p_id VARCHAR DEFAULT NULL, p_repairid VARCHAR DEFAULT NULL)
-RETURNS TABLE (id VARCHAR, repairid VARCHAR, producttypeid INT, repaircategoryid INT, price NUMERIC, notes VARCHAR) AS $$
+RETURNS TABLE (id VARCHAR, repairid VARCHAR, repaircategoryid INT, price NUMERIC, notes VARCHAR) AS $$
 BEGIN
     IF p_id IS NULL AND p_repairID IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.RepairLine;
@@ -442,20 +442,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in ProductType
-CREATE OR REPLACE FUNCTION demeterboots.ProductType_Commit(p_id INT, description VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.ProductType_Commit(p_id INT, description VARCHAR, price NUMERIC)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.ProductType (Description) VALUES (description);
+        INSERT INTO demeterboots.ProductType (Description, Price) VALUES (description, price);
     ELSE
-        UPDATE demeterboots.ProductType SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.ProductType SET Description = description, Price = price WHERE ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from ProductType
 CREATE OR REPLACE FUNCTION demeterboots.ProductType_Details(p_id INT DEFAULT NULL)
-RETURNS TABLE (id INT, description VARCHAR) AS $$
+RETURNS TABLE (id INT, description VARCHAR, price NUMERIC) AS $$
 BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.ProductType;
@@ -548,20 +548,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in RepairCategory
-CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Commit(p_id INT, producttypeid INT, description VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Commit(p_id INT, producttypeid INT, description VARCHAR, price NUMERIC)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.RepairCategory (ProductTypeID, Description) VALUES (producttypeid, description);
+        INSERT INTO demeterboots.RepairCategory (ProductTypeID, Description, Price) VALUES (producttypeid, description, price);
     ELSE
-        UPDATE demeterboots.RepairCategory SET ProductTypeID = producttypeid, Description = description WHERE ID = p_id;
+        UPDATE demeterboots.RepairCategory SET ProductTypeID = producttypeid, Description = description, Price = price WHERE ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from RepairCategory
 CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Details(p_id INT DEFAULT NULL, p_producttypeid INT DEFAULT NULL)
-RETURNS TABLE (id INT, producttypeid INT, description VARCHAR) AS $$
+RETURNS TABLE (id INT, producttypeid INT, description VARCHAR, price NUMERIC) AS $$
 BEGIN
     IF p_id IS NULL AND p_producttypeid IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.RepairCategory;

@@ -8,32 +8,54 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.MeasurementsException;
 
 public class Measurements {
 
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("customerID")
     private String customerID;
+    @JsonProperty("date")
     private Date date;
+    @JsonProperty("notes")
     private String notes;
+    @JsonProperty("feet")
     private Double feet;
+    @JsonProperty("bunion")
     private Double bunion;
+    @JsonProperty("highPoint")
     private Double highPoint;
+    @JsonProperty("heel")
     private Double heel;
+    @JsonProperty("ankle")
     private Double ankle;
+    @JsonProperty("calf")
     private Double calf;
+    @JsonProperty("underKnee")
     private Double underKnee;
+    @JsonProperty("height")
     private Double height;
+    @JsonProperty("calfHeight")
     private Double calfHeight;
+    @JsonProperty("tMark")
     private Double tMark;
+    @JsonProperty("imagePath")
     private String imagePath;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Measurements_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Measurements_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Measurements_Commit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -43,6 +65,7 @@ public class Measurements {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -111,14 +134,17 @@ public class Measurements {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<Measurements> getAllMeasurements() throws MeasurementsException {
         return Details("", "");
     }
 
+    @JsonIgnore
     public List<Measurements> getAllMeasurementsByCustomer(String id) throws MeasurementsException {
         return Details("", id);
     }
 
+    @JsonIgnore
     public final Measurements getMeasurementsDetails(String id, String customerID) throws MeasurementsException {
         List<Measurements> measList = Details(id, customerID);
         if (measList.isEmpty()) {

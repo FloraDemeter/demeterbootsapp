@@ -8,25 +8,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.RepairException;
 
 public class Repair {
 
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("customerID")
     private String customerID;
+    @JsonProperty("repairDate")
     private Date repairDate;
+    @JsonProperty("predictedDate")
     private Date predictedDate;
+    @JsonProperty("location")
     private String location;
+    @JsonProperty("total")
     private Double total;
+    @JsonProperty("isWarrantyAccepted")
     private Boolean isWarrantyAccepted;
+    @JsonProperty("status")
     private Integer status;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Repair_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Repair_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Repair_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -36,6 +51,7 @@ public class Repair {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -89,14 +105,17 @@ public class Repair {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<Repair> getAllRepairs() throws RepairException {
         return Details("","");
     }
 
+    @JsonIgnore
     public List<Repair> getAllRepairsForCustomer(String customerID) throws RepairException {
         return Details("", customerID);
     }
 
+    @JsonIgnore
     public final Repair getRepairDetails(String id) throws RepairException {
         List<Repair> repairs = Details(id, "");
         if (!repairs.isEmpty()) {

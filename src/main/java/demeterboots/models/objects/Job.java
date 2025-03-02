@@ -7,21 +7,34 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.JobException;
 
 public class Job {
+
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("employeeID")
     private String employeeID;
+    @JsonProperty("status")
     private Integer status;
+    @JsonProperty("taskID")
     private String taskID;
+    @JsonProperty("taskType")
     private String TaskType;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Job_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Job_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Job_Commit(?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -31,6 +44,7 @@ public class Job {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -79,14 +93,17 @@ public class Job {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<Job> getAllJobs() throws JobException{
         return Details("","");
     }
 
+    @JsonIgnore
     public List<Job> getJobsByEmployeeID(String employeeID) throws JobException{
         return Details( "", employeeID);
     }
 
+    @JsonIgnore
     public final Job getJobByID(String id) throws JobException{
         List<Job> jobs = Details(id, "");
         if (!jobs.isEmpty()) {

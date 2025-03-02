@@ -7,22 +7,34 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.LeatherException;
 
 public class Leather {
 
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("colour")
     private String colour;
+    @JsonProperty("description")
     private String description;
+    @JsonProperty("imagePath")
     private String imagePath;
+    @JsonProperty("isAvailable")
     private Boolean isAvailable;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Leather_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Leather_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Leather_Commit(?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -32,6 +44,7 @@ public class Leather {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -80,10 +93,12 @@ public class Leather {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<Leather> getAllLeathers() throws LeatherException {
         return Details(null);
     }
 
+    @JsonIgnore
     public final Leather getLeatherDetails(Integer id) throws LeatherException {
         List<Leather> leathers = Details(id);
         if (!leathers.isEmpty()) {

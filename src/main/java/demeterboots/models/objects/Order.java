@@ -8,25 +8,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.OrderException;
 
 public class Order {
 
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("customerID")
     private String customerID;
+    @JsonProperty("orderDate")
     private Date orderDate;
+    @JsonProperty("predictedFinishDate")
     private Date predictedFinishDate;
+    @JsonProperty("location")
     private String location;
+    @JsonProperty("total")
     private double total;
+    @JsonProperty("isWarrantyAccepted")
     private String isWarrantyAccepted; 
+    @JsonProperty("status")
     private String status; 
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Order_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Order_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Order_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -36,6 +51,7 @@ public class Order {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -90,14 +106,17 @@ public class Order {
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<Order> getAllOrders() throws OrderException {
         return Details("","");
     }
 
+    @JsonIgnore
     public List<Order> getAllOrdersForCustomer(String customerID) throws OrderException {
         return Details("", customerID);
     }
 
+    @JsonIgnore
     public final Order getOrderDetails(String id) throws OrderException {
         List<Order> orders = Details(id,"");
         if (!orders.isEmpty()) {

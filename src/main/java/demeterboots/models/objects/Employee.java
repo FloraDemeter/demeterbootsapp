@@ -8,32 +8,53 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
-import demeterboots.models.util.passwordHashing;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.EmployeeException;
+import demeterboots.models.util.passwordHashing;
 
 public class Employee {
 
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("firstName")
     private String firstName;
+    @JsonProperty("lastName")
     private String lastName;
+    @JsonProperty("street")
     private String street;
+    @JsonProperty("postCode")
     private String postCode;
+    @JsonProperty("city")
     private String city;
+    @JsonProperty("email")
     private String email;
+    @JsonProperty("phone")
     private String phone;
+    @JsonProperty("username")
     private String username;
+    @JsonProperty("password")
     private String password;
+    @JsonProperty("isActive")
     private Boolean isActive;
+    @JsonProperty("accessLevel")
     private Integer accessLevel;
+    @JsonProperty("startDate")
     private Date startDate;
+    @JsonProperty("endDate")
     private Date endDate;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Employee_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Employee_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Employee_Commit(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -43,6 +64,7 @@ public class Employee {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -116,19 +138,19 @@ public class Employee {
     public String toString() {
         return getFirstName() + " " + getLastName();
     }
-
+    @JsonIgnore
     public List<Employee> getAllEmployees() throws EmployeeException {
         return Details("","");
     }
-
+    @JsonIgnore
     public Employee getEmployeeById(String id) throws EmployeeException {
         return new Employee(id, false);
     }
-
+    @JsonIgnore
     public Employee getEmployeeByUserName(String username) throws EmployeeException {
         return new Employee(username, true);
     }
-
+    @JsonIgnore
     public final Employee getEmployeeDetails(String id, String username) throws EmployeeException {
         List<Employee> employees = Details(id, username);
         if (!employees.isEmpty()) {
@@ -136,7 +158,7 @@ public class Employee {
         }
         return null;
     }
-
+    @JsonIgnore
     public Boolean tryLoginUser(String username, String password) throws EmployeeException {
         dataContext.currentUser = getEmployeeByUserName(username);
         if (dataContext.currentUser == null) {

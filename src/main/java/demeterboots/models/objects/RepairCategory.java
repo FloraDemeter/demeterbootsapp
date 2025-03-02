@@ -12,21 +12,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
-import demeterboots.models.util.exceptions.ProductStyleTypeException;
+import demeterboots.models.util.exceptions.RepairCategoryException;
 
-public class ProductStyleType {
+public class RepairCategory {
     
     @JsonProperty("id")
     private Integer id;
+    @JsonProperty("productTypeId")
+    private Integer productTypeId;
     @JsonProperty("description")
     private String description;
+    @JsonProperty("price")
+    private Double price;
 
     @JsonIgnore
-    private static String detailsFunction  = "SELECT * FROM demeterboots.ProductStyleType_Details(?)";
+    private static String detailsFunction  = "SELECT * FROM demeterboots.RepairCategory_Details(?)";
     @JsonIgnore
-    private static String deleteFunction  = "CALL demeterboots.ProductStyleType_Delete(?)";
+    private static String deleteFunction  = "CALL demeterboots.RepairCategory_Delete(?)";
     @JsonIgnore
-    private static String commitFunction  = "CALL demeterboots.ProductStyleType_Commit(?, ?)";
+    private static String commitFunction  = "CALL demeterboots.RepairCategory_Commit(?, ?, ? ,?)";
 
     @JsonIgnore
     private final static DataContext dataContext;
@@ -56,31 +60,34 @@ public class ProductStyleType {
     private static Connection getConnection () throws DatabaseException {
         return dataContext.getConnection();
     }
-
 //region Constructors
 //--------------------------------------------------------
 
-    public ProductStyleType() {
+    public RepairCategory() {
     }
 
-    public ProductStyleType(Integer id) throws ProductStyleTypeException{
-        ProductStyleType prodtype;
+    public RepairCategory(Integer id) throws RepairCategoryException{
+        RepairCategory repairCat;
 
         if (id == null) {
             return;
         }
 
-        prodtype = getProductTypeDetails(id);
+        repairCat = getRepairCategoryDetails(id);
 
-        if (prodtype != null) {
-            this.id = prodtype.id;
-            this.description = prodtype.description;
+        if (repairCat != null) {
+            this.id = repairCat.id;
+            this.productTypeId = repairCat.productTypeId;
+            this.description = repairCat.description;
+            this.price = repairCat.price;
         }
     }
 
-    public ProductStyleType(Integer id, String description) {
+    public RepairCategory(Integer id, Integer productTypeId, String description, Double price) {
         this.id = id;
+        this.productTypeId = productTypeId;
         this.description = description;
+        this.price = price;
     }
 //--------------------------------------------------------
 //endregion
@@ -89,15 +96,15 @@ public class ProductStyleType {
 //--------------------------------------------------------
 
     @JsonIgnore
-    public List<ProductStyleType> getAllProductTypes() throws ProductStyleTypeException {
+    public List<RepairCategory> getAllRepairCategory() throws RepairCategoryException {
         return Details(null);
     }
 
     @JsonIgnore
-    public final ProductStyleType getProductTypeDetails(Integer id) throws ProductStyleTypeException {
-        List<ProductStyleType> prodTypes = Details(id);
-        if (!prodTypes.isEmpty()) {
-            return prodTypes.get(0);
+    public final RepairCategory getRepairCategoryDetails(Integer id) throws RepairCategoryException {
+        List<RepairCategory> repairCats = Details(id);
+        if (!repairCats.isEmpty()) {
+            return repairCats.get(0);
         }
         return null;
     }
@@ -108,29 +115,31 @@ public class ProductStyleType {
 //region Database Methods
 //--------------------------------------------------------
 
-    public List<ProductStyleType> Details(Integer id) throws ProductStyleTypeException {
-        List<ProductStyleType> prodTypes = new ArrayList<>();
+    public List<RepairCategory> Details(Integer id) throws RepairCategoryException {
+        List<RepairCategory> repairCats = new ArrayList<>();
         try { PreparedStatement statement = connection.prepareStatement(detailsFunction);
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    ProductStyleType prodtype = new ProductStyleType();
-                    prodtype.id = resultSet.getInt("id");
-                    prodtype.description = resultSet.getString("description");
-                    prodTypes.add(prodtype); 
+                    RepairCategory repairCat = new RepairCategory();
+                    repairCat.id = resultSet.getInt("id");
+                    repairCat.productTypeId = resultSet.getInt("productTypeId");
+                    repairCat.description = resultSet.getString("description");
+                    repairCat.price = resultSet.getDouble("price");
+                    repairCats.add(repairCat); 
                 }
             }
         } catch (SQLException e) {
             if (id != null) {
-                throw new ProductStyleTypeException(String.format("Error fetching product type details for ID %s", id),e);
+                throw new RepairCategoryException(String.format("Error fetching repair category details for ID %s", id),e);
             }
-            throw new ProductStyleTypeException("Error fetching product type details", e);
+            throw new RepairCategoryException("Error fetching repair category details", e);
         }
 
-        return prodTypes;
+        return repairCats;
     }
 
-    public void Delete() throws ProductStyleTypeException {
+    public void Delete() throws RepairCategoryException {
         if (id == null) {
             return;
         }
@@ -138,20 +147,22 @@ public class ProductStyleType {
             statement.setInt(1, id);
             statement.execute();
         } catch (SQLException e) {
-            throw new ProductStyleTypeException(String.format("Error deleting product type with ID %s", id), e);
+            throw new RepairCategoryException(String.format("Error deleting repair category with ID %s", id), e);
         }
     }
 
-    public void Commit() throws ProductStyleTypeException {
+    public void Commit() throws RepairCategoryException {
         try { PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setInt(1, id);
-            statement.setString(2, description);
+            statement.setInt(2, productTypeId);
+            statement.setString(3, description);
+            statement.setDouble(4, price);
             statement.execute();
         } catch (SQLException e) {
             if (id != null) {
-                throw new ProductStyleTypeException(String.format("Error updating product type with ID %s", id), e);
+                throw new RepairCategoryException(String.format("Error updating repair category with ID %s", id), e);
             }
-            throw new ProductStyleTypeException("Error commiting product type", e);
+            throw new RepairCategoryException("Error commiting repair category", e);
         }
     }
 //--------------------------------------------------------
@@ -169,12 +180,28 @@ public class ProductStyleType {
         this.id = id;
     }
 
+    public Integer getProductTypeId() {
+        return productTypeId;
+    }
+
+    public void setProductTypeId(Integer productTypeId) {
+        this.productTypeId = productTypeId;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 //--------------------------------------------------------
 //endregion

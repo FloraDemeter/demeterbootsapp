@@ -7,23 +7,35 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.RepairLineException;
 
 public class RepairLine {
+
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("repairID")
     private String repairID;
-    private Integer productTypeID;
+    @JsonProperty("repairCategoryID")
     private Integer repairCategoryID;
+    @JsonProperty("price")
     private Double price;
+    @JsonProperty("notes")
     private String notes; 
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.RepairLine_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.RepairLine_Delete(?)";
-    private static String commitFunction  = "CALL demeterboots.RepairLine_Commit(?, ?, ?, ?, ?, ?)";
+    @JsonIgnore
+    private static String commitFunction  = "CALL demeterboots.RepairLine_Commit(?, ?, ?, ?, ?)";
 
-private final static DataContext dataContext;
+    @JsonIgnore
+    private final static DataContext dataContext;
 
     static {
         try {
@@ -32,6 +44,7 @@ private final static DataContext dataContext;
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -60,17 +73,15 @@ private final static DataContext dataContext;
         if (repairline != null) {
             this.id = repairline.id;
             this.repairID = repairline.repairID;
-            this.productTypeID = repairline.productTypeID;
             this.repairCategoryID = repairline.repairCategoryID;
             this.price = repairline.price;
             this.notes = repairline.notes;
         }
     }
 
-    public RepairLine(String id, String repairID, Integer productTypeID, Integer repairCategoryID, Double price, String notes) {
+    public RepairLine(String id, String repairID, Integer repairCategoryID, Double price, String notes) {
         this.id = id;
         this.repairID = repairID;
-        this.productTypeID = productTypeID;
         this.repairCategoryID = repairCategoryID;
         this.price = price;
         this.notes = notes;
@@ -81,14 +92,17 @@ private final static DataContext dataContext;
 //region Methods
 //--------------------------------------------------------
 
+    @JsonIgnore
     public List<RepairLine> getAllRepairLines() throws RepairLineException {
         return Details("", "");
     }
 
+    @JsonIgnore
     public List<RepairLine> getAllRepairLinesForRepair(String repairId) throws RepairLineException {
         return Details("", repairID);
     }
 
+    @JsonIgnore
     public final RepairLine getRepairLineDetails(String id) throws RepairLineException {
         List<RepairLine> repairLines = Details(id, "");
         if (!repairLines.isEmpty()) {
@@ -121,7 +135,6 @@ private final static DataContext dataContext;
                     RepairLine repairline = new RepairLine();
                     this.id = reader.getString("id");
                     this.repairID = reader.getString("repairID");
-                    this.productTypeID = reader.getInt("productTypeID");
                     this.repairCategoryID = reader.getInt("repairCategoryID");
                     this.price = reader.getDouble("price");
                     this.notes = reader.getString("notes");
@@ -155,7 +168,6 @@ private final static DataContext dataContext;
         try {PreparedStatement statement = connection.prepareStatement(commitFunction);
             statement.setString(1, id);
             statement.setString(2, repairID);
-            statement.setInt(3, productTypeID);
             statement.setInt(4, repairCategoryID);
             statement.setDouble(5, price);
             statement.setString(6, notes);
@@ -187,14 +199,6 @@ private final static DataContext dataContext;
 
     public void setRepairID(String repairID) {
         this.repairID = repairID;
-    }
-
-    public Integer getProductTypeID() {
-        return productTypeID;
-    }
-
-    public void setProductTypeID(Integer productTypeID) {
-        this.productTypeID = productTypeID;
     }
 
     public Integer getRepairCategoryID() {

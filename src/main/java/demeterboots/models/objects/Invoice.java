@@ -8,24 +8,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import demeterboots.models.util.DataContext;
 import demeterboots.models.util.exceptions.DatabaseException;
 import demeterboots.models.util.exceptions.InvoiceException;
 
 public class Invoice {
+
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("customerId")
     private String customerId;
+    @JsonProperty("status")
     private Integer status;
+    @JsonProperty("paymentType")
     private Integer paymentType;
+    @JsonProperty("total")
     private Double total;
+    @JsonProperty("invoiceDate")
     private Date invoiceDate;
+    @JsonProperty("paymentDate")
     private Date paymentDate;
+    @JsonProperty("isPaid")
     private Boolean isPaid;
 
+    @JsonIgnore
     private static String detailsFunction  = "SELECT * FROM demeterboots.Invoice_Details(?, ?)";
+    @JsonIgnore
     private static String deleteFunction  = "CALL demeterboots.Invoice_Delete(?)";
+    @JsonIgnore
     private static String commitFunction  = "CALL demeterboots.Invoice_Commit(?, ?, ?, ?, ?, ?, ?, ?)";
 
+    @JsonIgnore
     private final static DataContext dataContext;
 
     static {
@@ -35,6 +51,7 @@ public class Invoice {
             throw new ExceptionInInitializerError(e);
         }
     }
+    @JsonIgnore
     private static Connection connection;
 
     static {
@@ -90,33 +107,37 @@ public class Invoice {
 //region Methods
 //--------------------------------------------------------
 
-public List<Invoice> getAllInvoices() throws InvoiceException{
-    return Details("","");
-}
-
-public List<Invoice> getAllInvoicesByCustomerID(String customerID) throws InvoiceException{
-    return Details("", customerID);
-}
-
-public Invoice getInvoice(String invoiceID) throws InvoiceException{
-    return new Invoice (invoiceID);
-}
-
-public final Invoice getInvoiceDetails(String invoiceID, String customerID) throws InvoiceException{
-    List<Invoice> invoices = Details(invoiceID, customerID);
-    if (!invoices.isEmpty()) {
-        return invoices.get(0);
+    @JsonIgnore
+    public List<Invoice> getAllInvoices() throws InvoiceException{
+        return Details("","");
     }
-    return null;
-}
 
-private static DataContext getDataContext() throws DatabaseException {
-    return DataContext.getInstance();
-}
+    @JsonIgnore
+    public List<Invoice> getAllInvoicesByCustomerID(String customerID) throws InvoiceException{
+        return Details("", customerID);
+    }
 
-private static Connection getConnection () throws DatabaseException {
-    return dataContext.getConnection();
-}
+    @JsonIgnore
+    public Invoice getInvoice(String invoiceID) throws InvoiceException{
+        return new Invoice (invoiceID);
+    }
+
+    @JsonIgnore
+    public final Invoice getInvoiceDetails(String invoiceID, String customerID) throws InvoiceException{
+        List<Invoice> invoices = Details(invoiceID, customerID);
+        if (!invoices.isEmpty()) {
+            return invoices.get(0);
+        }
+        return null;
+    }
+
+    private static DataContext getDataContext() throws DatabaseException {
+        return DataContext.getInstance();
+    }
+
+    private static Connection getConnection () throws DatabaseException {
+        return dataContext.getConnection();
+    }
 
 //--------------------------------------------------------
 //endregion
