@@ -5,77 +5,59 @@ import TextField from '../../components/elements/textfield';
 import { Button } from '../../components/elements/button';
 import { EmployeeJobsTable } from '../../components/elements/table';
 import Checkbox from '../../components/elements/checkbox';
+import { Employee, Job } from '../../components/interfaces/Employee';
+import {getEmployeeID, getJobsByEmployeeID} from "../../services/employees";
 
 const EmployeeForm: React.FC = () => {
     const [searchParams] = useSearchParams();
     const isNew = searchParams.get("view") === "new";
-
+    const employeeID = searchParams.get("view");
+    
     const today = new Date();
 
-    const defaultInfo = { 
-        FirstName: "", 
-        LastName: "", 
-        Phone: "", 
-        Email: "", 
-        Street: "", 
-        City: "", 
-        PostCode: "",
-        username: "",
-        password:"",
-        isActive: true,
-        accessLevel: "",
-        startDate: today
-    };
-
-    const dummyData = { 
-        FirstName: "John", 
-        LastName: "Doe", 
-        Phone: "1234567890", 
-        Email: "johndoe@email.com", 
-        Street: "1234 Anywhere Street", 
-        City: "New York", 
-        PostCode: "1234WF",
-        username: "AdminJohn",
-        password:"testing",
-        isActive: true,
-        accessLevel: "Admin",
-        startDate: today
-    };
-
-    const defaultJobInfo: any[] = [];
-    const dummyJobData = [
-        { "Task ID": "O00000001", Status:"Preprocessing" },
-        { "Task ID": "I00000001", Status:"Wating for payment" }
-    ];
-
-    const [customerInfo, setCustomerInfo] = useState(defaultInfo);
-    const [jobInfo, setMeasurementInfo] = useState(defaultJobInfo);
+    const [employeeInfo, setEmployeeInfo] = useState<Employee>();
+    const [jobInfo, setJobInfo] = useState<Job[]>([]);
     
     useEffect(() => {
         if (!isNew) {
-            setCustomerInfo(dummyData);
-            setMeasurementInfo(dummyJobData);
+            fetchEmployee(employeeID);
         }
     }, [isNew]);
+
+    const fetchEmployee = async (employeeID: string | null) => {
+        try {
+            if (!employeeID) {
+                throw new Error("Employee ID is missing");
+            }
+
+            const employeeData = await getEmployeeID(employeeID);
+            setEmployeeInfo(employeeData);
+
+            const jobData = await getJobsByEmployeeID(employeeID);
+            setJobInfo(jobData);
+        } catch (error) {
+            console.error("Error fetching employee details and jobs: ", error);
+        }
+    }
 
     return (
         <div className='employee-form'>
             <form>
                 <div className="column-left">
-                    <TextField label="First Name" value={customerInfo.FirstName} />
-                    <TextField label="Last Name" value={customerInfo.LastName} />
-                    <TextField label="Email" value={customerInfo.Email} />
-                    <TextField label="Phone" value={customerInfo.Phone} />
-                    <TextField label="Username" value={customerInfo.username} />
-                    <TextField label="Password" type="password" value={customerInfo.password} />
+                    <TextField label="First Name" value={employeeInfo?.firstName} />
+                    <TextField label="Last Name" value={employeeInfo?.lastName} />
+                    <TextField label="Email" value={employeeInfo?.email} />
+                    <TextField label="Phone" value={employeeInfo?.phone} />
+                    <TextField label="Username" value={employeeInfo?.username} />
+                    <TextField label="Password" type="password" value={employeeInfo?.password} />
                 </div>
                 <div className="column-right">
-                    <TextField label="Street" value={customerInfo.Street} />
-                    <TextField label="City" value={customerInfo.City} />
-                    <TextField label="Postcode" value={customerInfo.PostCode} />
-                    <TextField label="Access Level" value={customerInfo.accessLevel} />
-                    <TextField label="Start Date" type="date" value={customerInfo.startDate.toISOString().split("T")[0]} />
-                    <Checkbox label="Is User Active?" defaultChecked={customerInfo.isActive} />
+                    <TextField label="Street" value={employeeInfo?.street} />
+                    <TextField label="City" value={employeeInfo?.city} />
+                    <TextField label="Postcode" value={employeeInfo?.postCode} />
+                    <TextField label="Access Level" value={employeeInfo?.accessLevel} />
+                    <TextField label="Start Date" type="date" value={employeeInfo?.startDate} />
+                    <Checkbox label="Is User Active?" defaultChecked={employeeInfo?.isActive} />
                 </div>
                 <Button type="submit" variant="primary">Save</Button>
             </form>

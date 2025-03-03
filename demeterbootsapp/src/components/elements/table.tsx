@@ -188,11 +188,9 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.firstName} {row.lastName}</td>
+            <td>{row.Status}</td>
+            <td>{row.taskID}</td>
         </tr>
         ))}
     </tbody>
@@ -216,11 +214,8 @@ export const EmployeeJobsTable: React.FC<TableProps> = ({ data }) => {
         <tbody>
             {data.map((row, rowIndex) => (
             <tr key={rowIndex} className="border">
-                {headers.map((header, colIndex) => (
-                <td key={colIndex} className="">
-                    {row[header]}
-                </td>
-                ))}
+                <td>{row.taskID}</td>
+                <td>{row.status}</td>
             </tr>
             ))}
         </tbody>
@@ -305,11 +300,10 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.id}</td>
+            <td>{row.firstName}</td>
+            <td>{row.lastName}</td>
+            <td>{row.accessLevel}</td>
         </tr>
         ))}
     </tbody>

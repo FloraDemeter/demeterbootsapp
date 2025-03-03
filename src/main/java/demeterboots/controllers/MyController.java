@@ -6,9 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MyController {
 
-    // Handle requests to the root path '/'
     @GetMapping("/")
     public String root() {
-        return "Welcome to the root path!";
+        return "Connected to the server!";
     }
 }

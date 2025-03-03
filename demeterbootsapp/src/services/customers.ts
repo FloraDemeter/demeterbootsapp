@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://localhost:3000/api/customers';
 
 export const getCustomers = async() => {
     try {
-        const response = await axios.get(`${BASE_URL}/customers`, {
+        const response = await axios.get(`${BASE_URL}`, {
             withCredentials: true
         });
         return response.data;
@@ -16,7 +16,7 @@ export const getCustomers = async() => {
 
 export const getCustomerID = async(customerID: string) => {
     try {
-        const response = await axios.get(`${BASE_URL}/customers/${customerID}`, {
+        const response = await axios.get(`${BASE_URL}/${customerID}`, {
             withCredentials: true
         });
         return response.data;
@@ -28,7 +28,7 @@ export const getCustomerID = async(customerID: string) => {
 
 export const getMeasurementsByID = async(customerID: string) => {
     try {
-        const response = await axios.get(`${BASE_URL}/customers/measurements/${customerID}`, {
+        const response = await axios.get(`${BASE_URL}/measurements/${customerID}`, {
             withCredentials: true
         });
         return response.data;

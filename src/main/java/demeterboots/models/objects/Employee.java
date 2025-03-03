@@ -89,9 +89,9 @@ public class Employee {
         }
         
         if (isUsername) {
-            employee = getEmployeeDetails(value, "");
-        } else {
             employee = getEmployeeDetails("", value);
+        } else {
+            employee = getEmployeeDetails(value, "");
         }
         if (employee != null) {
             this.id = employee.id;
@@ -208,7 +208,7 @@ public class Employee {
                     employee.postCode = rs.getString("postCode");
                     employee.city = rs.getString("city");
                     employee.email = rs.getString("email");
-                    employee.phone = rs.getString("phone");
+                    employee.phone = rs.getString("phonenumber");
                     employee.username = rs.getString("username");
                     employee.password = rs.getString("password");
                     employee.isActive = rs.getBoolean("isActive");

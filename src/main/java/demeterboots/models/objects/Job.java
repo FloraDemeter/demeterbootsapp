@@ -143,7 +143,7 @@ public class Job {
             stmt.setString(1, id.isEmpty() ? null : id);
             stmt.setString(2, employeeID.isEmpty() ? null : employeeID);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     Job job = new Job();
                     job.id = rs.getString("id");
                     job.employeeID = rs.getString("employeeID");

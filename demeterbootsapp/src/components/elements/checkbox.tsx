@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect} from "react";
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -7,6 +7,10 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Checkbox: React.FC<CheckboxProps> = ({ label, defaultChecked=false, ...props }) => {
     const [isChecked, setIsChecked] = useState(defaultChecked);
+
+    useEffect(() => {
+        setIsChecked(defaultChecked);
+    }, [defaultChecked]);
 
     const handleClick = () => {
         setIsChecked((prev) => !prev);
