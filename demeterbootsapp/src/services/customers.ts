@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/customers';
+const BASE_URL = 'http://localhost:8080/api/customers';
 
 export const getCustomers = async() => {
     try {
+
         const response = await axios.get(`${BASE_URL}`, {
             withCredentials: true
         });
@@ -25,7 +26,6 @@ export const getCustomerID = async(customerID: string) => {
         throw error;
     }
 }
-
 export const getMeasurementsByID = async(customerID: string) => {
     try {
         const response = await axios.get(`${BASE_URL}/measurements/${customerID}`, {
