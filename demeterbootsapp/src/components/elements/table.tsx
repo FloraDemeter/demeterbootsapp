@@ -46,7 +46,7 @@ export const OrderLineTable: React.FC<TableProps> = ({ data }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
+            {data.map((row, rowIndex) => (
             <tr key={rowIndex} className="border">
                 <td>{row.productTypeID}</td>
                 <td>{row.productStyle}</td>
@@ -54,7 +54,7 @@ export const OrderLineTable: React.FC<TableProps> = ({ data }) => {
                 <td>{row.price}</td>
                 <td>{row.notes}</td>
             </tr>
-          ))}
+            ))}
         </tbody>
       </table>
     );
@@ -184,8 +184,8 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            <td>{row.firstName} {row.lastName}</td>
-            <td>{row.Status}</td>
+            <td>{row.employeeID}</td>
+            <td>{row.status}</td>
             <td>{row.taskID}</td>
         </tr>
         ))}

@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { JobTable } from '../../components/elements/table';
+import { getJobs } from '../../services/jobs';
+import { Job } from '../../components/interfaces/Employee';
 
 const JobsList: React.FC = () => {
-   
-       const dummyJobsData = [
-           { 'Task ID': 'J00000001', 'Employee Name': 'John Doe', Status: 'Preprocessing' },
-           { 'Task ID': 'J00000002', 'Employee Name': 'Jane Doe', Status: 'Finished' }
-         ];
-   
-       const [jobs, setJobs] = useState(dummyJobsData);
+       const [jobs, setJobs] = useState<Job[]>([]);
    
        const fetchJobs = async () => {
            try {
-               setJobs(dummyJobsData);
+                const data = await getJobs();
+                setJobs(data);
            } catch (error) {
                console.error("Error fetching jobs:", error);
            }
