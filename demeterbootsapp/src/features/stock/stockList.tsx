@@ -1,23 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { ProductTypeTable, RepairCategoryTable, LeatherTable } from '../../components/elements/table';
 import { Button } from '../../components/elements/button';
 import { ProductTypePopUp, RepairCategoryPopUp, LeatherPopUp } from './stockPopups';
 import ConfirmPopUp from '../../components/layout/confirmPopUp';
+import { Leather, ProductType, RepairCategory } from '../../components/interfaces/Stock';
+import { getProductTypes, getLeathers, getRepairCategories } from '../../services/stock';
 
 const StockList: React.FC = () => {
-    const productTypes = [
-        {"Description": "Boots", "Price": 500},
-        {"Description": "Short Boots", "Price": 250}
-    ];
-    const repairCategories = [
-        {"Product Type": "Chaps", "Description": "Zip Replacement", "Price": 500}, 
-        {"Product Type": "Boots", "Description": "Sole Refill", "Price": 500}
-    ];
-    const leathers = [
-        {"Description": "Crocodile", "Colour": "Brown", "Is Available?": true},
-        {"Description": "Patent", "Colour": "Red", "Is Available?": false}
-    ];
-
     const [isAddProductTypePopUpOpen, setIsAddProductTypePopUpOpen] = useState(false);
     const [isAddRepairCategoryPopUpOpen, setIsAddRepairCategoryPopUpOpen] = useState(false);
     const [isAddLeatherPopUpOpen, setIsAddLeatherPopUpOpen] = useState(false);
@@ -30,6 +19,28 @@ const StockList: React.FC = () => {
     const [isConfirmRepairCategoryPopUpOpen, setIsConfirmRepairCategoryPopUpOpen] = useState(false);
     const [isConfirmLeatherPopUpOpen, setIsConfirmLeatherPopUpOpen] = useState(false);
 
+    const [productTypeInfo, setProductType] = useState<ProductType[]>([]);
+    const [repairCategoryInfo, setRepairCategory] = useState<RepairCategory[]>([]);
+    const [leatherInfo, setLeather] = useState<Leather[]>([]);
+
+    const fetchStock = async () => {
+        try {
+            const productTypeData = await getProductTypes();
+            const repairCategoryData = await getRepairCategories();
+            const leatherData = await getLeathers();
+
+            setProductType(productTypeData);
+            setRepairCategory(repairCategoryData);
+            setLeather(leatherData);
+        } catch (error) {
+            console.error("Error fetching stock:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchStock();
+    }, []);
+
     return (
         <div>
             <div className="product-type">
@@ -41,7 +52,7 @@ const StockList: React.FC = () => {
                     <Button variant="primary" onClick={() => setIsConfirmProductTypePopUpOpen(true)}>Delete product type</Button>
                     <ConfirmPopUp isPopUpOpen={isConfirmProductTypePopUpOpen} setIsPopUpOpen={setIsConfirmProductTypePopUpOpen} purpose="delete" text='Are you sure you would like to delete this product type?' />
                 </div>
-                <ProductTypeTable data={productTypes} />
+                <ProductTypeTable data={productTypeInfo} />
             </div>
             <div className="repair-category">
                 <div className="actions">
@@ -52,7 +63,7 @@ const StockList: React.FC = () => {
                     <Button variant="primary" onClick={() => setIsConfirmRepairCategoryPopUpOpen(true)}>Delete repair category</Button>
                     <ConfirmPopUp isPopUpOpen={isConfirmRepairCategoryPopUpOpen} setIsPopUpOpen={setIsConfirmRepairCategoryPopUpOpen} purpose="delete" text='Are you sure you would like to delete this repair category?' />
                 </div>
-                <RepairCategoryTable data={repairCategories} />
+                <RepairCategoryTable data={repairCategoryInfo} />
             </div>
             <div className="leathers">
                 <div className="actions">
@@ -63,7 +74,7 @@ const StockList: React.FC = () => {
                     <Button variant="primary" onClick={() => setIsConfirmLeatherPopUpOpen(true)}>Delete leather</Button>
                     <ConfirmPopUp isPopUpOpen={isConfirmLeatherPopUpOpen} setIsPopUpOpen={setIsConfirmLeatherPopUpOpen} purpose="delete" text='Are you sure you would like to delete this leather?' />
                 </div>
-                <LeatherTable data={leathers} />
+                <LeatherTable data={leatherInfo} />
             </div>
         </div>
     )

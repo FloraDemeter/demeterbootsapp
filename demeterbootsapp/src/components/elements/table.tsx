@@ -322,12 +322,9 @@ export const ProductTypeTable: React.FC<TableProps> = ({ data }) => {
             </thead>
             <tbody>
                 {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="">
-                    {headers.map((header, colIndex) => (
-                    <td key={colIndex} className="">
-                        {row[header]}
-                    </td>
-                    ))}
+                <tr key={rowIndex} className="border">
+                    <td>{row.description}</td>
+                    <td>{row.price}</td>
                 </tr>
                 ))}
             </tbody>
@@ -350,12 +347,10 @@ export const RepairCategoryTable: React.FC<TableProps> = ({ data }) => {
             </thead>
             <tbody>
                 {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="">
-                    {headers.map((header, colIndex) => (
-                    <td key={colIndex} className="">
-                        {row[header]}
-                    </td>
-                    ))}
+                <tr key={rowIndex} className="border">
+                    <td>{row.productTypeId}</td>
+                    <td>{row.description}</td>
+                    <td>{row.price}</td>
                 </tr>
                 ))}
             </tbody>
@@ -378,12 +373,10 @@ export const LeatherTable: React.FC<TableProps> = ({ data }) => {
             </thead>
             <tbody>
                 {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="">
-                    {headers.map((header, colIndex) => (
-                    <td key={colIndex} className="">
-                        {row[header]}
-                    </td>
-                    ))}
+                <tr key={rowIndex} className="border">
+                    <td>{row.description}</td>
+                    <td>{row.colour}</td>
+                    <td>{row.isAvailable ? "Yes" : "No"}</td>
                 </tr>
                 ))}
             </tbody>

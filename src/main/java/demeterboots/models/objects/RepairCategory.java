@@ -97,7 +97,7 @@ public class RepairCategory {
 
     @JsonIgnore
     public static List<RepairCategory> getAllRepairCategory() throws RepairCategoryException {
-        return Details(null);
+        return Details(0);
     }
 
     @JsonIgnore
@@ -128,7 +128,7 @@ public class RepairCategory {
     private static List<RepairCategory> Details(Integer id) throws RepairCategoryException {
         List<RepairCategory> repairCats = new ArrayList<>();
         try { PreparedStatement statement = connection.prepareStatement(detailsFunction);
-            statement.setInt(1, id == 0 ? null : id);
+            statement.setObject(1, id == 0 ? null : id, java.sql.Types.INTEGER);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     RepairCategory repairCat = new RepairCategory();

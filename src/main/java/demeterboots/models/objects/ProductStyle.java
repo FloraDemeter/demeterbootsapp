@@ -94,7 +94,7 @@ public class ProductStyle {
 
     @JsonIgnore
     public static List<ProductStyle> getAllProductStyles() throws ProductStyleException {
-        return Details(null);
+        return Details(0);
     }
 
     @JsonIgnore
@@ -125,7 +125,7 @@ public class ProductStyle {
     private static List<ProductStyle> Details(Integer id) throws ProductStyleException {
         List<ProductStyle> prodStyles = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
-            statement.setInt(1, id == 0 ? null : id);
+            statement.setObject(1, id == 0 ? null : id, java.sql.Types.INTEGER);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     ProductStyle style = new ProductStyle();

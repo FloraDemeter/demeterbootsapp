@@ -95,12 +95,17 @@ public class Leather {
 
     @JsonIgnore
     public static List<Leather> getAllLeathers() throws LeatherException {
-        return Details(null);
+        return Details(0, null);
+    }
+
+    @JsonIgnore
+    public static List<Leather> getAllAvailableLeathers() throws LeatherException {
+        return Details(0, true);
     }
 
     @JsonIgnore
     public static final Leather getLeatherDetails(Integer id) throws LeatherException {
-        List<Leather> leathers = Details(id);
+        List<Leather> leathers = Details(id, null);
         if (!leathers.isEmpty()) {
             return leathers.get(0);
         }
@@ -133,10 +138,11 @@ public class Leather {
 //region Database Methods
 //--------------------------------------------------------
     
-    private static List<Leather> Details(Integer id) throws LeatherException {
+    private static List<Leather> Details(Integer id, Boolean isAvailable) throws LeatherException {
         List<Leather> leathers = new ArrayList<>();
         try(PreparedStatement statement = connection.prepareStatement(detailsFunction)) {
-            statement.setInt(1, id == 0 ? null : id);
+            statement.setObject(1, id == 0 ? null : id, java.sql.Types.INTEGER);
+            statement.setObject(2, isAvailable, java.sql.Types.BOOLEAN);
             try(ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Leather leather = new Leather();
