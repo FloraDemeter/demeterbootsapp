@@ -1,7 +1,7 @@
 import React from "react";
 
 interface TableProps {
-  data: any[]; // You can refine this type based on your data structure
+  data: any[];
 }
 
 export const OrderTable: React.FC<TableProps> = ({ data }) => {
@@ -76,11 +76,11 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.id}</td>
+            <td>{row.customerID}</td>
+            <td>{row.location}</td>
+            <td>{row.status}</td>
+            <td>{row.total}</td>
         </tr>
         ))}
     </tbody>
@@ -104,11 +104,10 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>this would be type</td>
+            <td>{row.repairCategoryID}</td>
+            <td>{row.price}</td>
+            <td>{row.notes}</td>
         </tr>
         ))}
     </tbody>

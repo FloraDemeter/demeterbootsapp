@@ -139,7 +139,7 @@ public class RepairLine {
         List<RepairLine> repairLines = new ArrayList<>();
         try {PreparedStatement statement = connection.prepareStatement(detailsFunction);
             statement.setString(1, id.isEmpty() ? null : id);
-            statement.setString(2, repairID.isEmpty() ? null : id);
+            statement.setString(2, repairID.isEmpty() ? null : repairID);
             try(ResultSet reader = statement.executeQuery()) {
                 while (reader.next()) {
                     RepairLine repairline = new RepairLine();

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState} from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TextField from '../../components/elements/textfield';
@@ -8,53 +7,22 @@ import RepairLinePopUp  from './repairlinePopup';
 import DropDown from '../../components/elements/dropdown';
 import Checkbox from '../../components/elements/checkbox';
 import ConfirmPopUp from '../../components/layout/confirmPopUp';
+import { Repair, RepairLine } from '../../components/interfaces/Repair';
+import { Customer } from '../../components/interfaces/Customer';
+import { getRepairID, getRepairLineByRepairID } from '../../services/repairs';
+import { getCustomers } from '../../services/customers';
+import { Status } from '../../components/interfaces/BusinessInfo';
+import { getStatuses } from '../../services/businessInfo';
 
 const RepairForm: React.FC = () => {
     const [searchParams] = useSearchParams();
     const isNew = searchParams.get("view") === "new";
+    const repairId = searchParams.get("view");
 
     const today = new Date();
-    const predictedFinishDate = new Date();
-    predictedFinishDate.setDate(today.getDate() + 21);
-    
-    const defaultInfo = { 
-        Customer: "", 
-        Location: "", 
-        Status: "", 
-        Total: "",
-        isWarrantyAcccepted: false,
-        Date: today,
-        PredictedFinish: predictedFinishDate 
-    };
-    
-    const dummyRepairData = { 
-        Customer: "C000000001", 
-        Location: "London", 
-        Status: "In Progress", 
-        Total: "265",
-        isWarrantyAcccepted: true,
-        Date: today,
-        PredictedFinish: predictedFinishDate 
-    };
-    
-
-    const defaultLineInfo: any[] = [];
-    const dummyLineData = [
-        { Type: "Boots", 'Repair Kind': "testing testing", Price: 500, Notes: "make it extra wide"},
-        { Type: "Chaps", 'Repair Kind': "testing testing", Price: 200, Notes: "tessst"}
-    ];
-    const [repair, setRepairInfo] = useState(defaultInfo);
-    const [repairline, setRepairLineInfo] = useState(defaultLineInfo);
-
-    useEffect(() => {
-        if (!isNew) {
-            setRepairInfo(dummyRepairData);
-            setRepairLineInfo(dummyLineData);
-            setSelectedCustomerType(dummyRepairData.Customer);
-            setSelectedStatus("1");
-        }
-    }, [isNew]);
-
+   
+    const [repair, setRepairInfo] = useState<Repair>();
+    const [repairline, setRepairLineInfo] = useState<RepairLine[]>([]);
     const [selectedCustomerType, setSelectedCustomerType] = useState<string>("Please select one");
     const [selectedStatus, setSelectedStatus] = useState<string>("Please select one");
 
@@ -62,18 +30,54 @@ const RepairForm: React.FC = () => {
     const [isEditPopUpOpen, setIsEditPopUpOpen] = useState(false);
     const [isConfirmPopUpOpen, setIsConfirmPopUpOpen] = useState(false);
 
-    const customers = [
-        {value:"", label:"Please select one"},
-        {value:"C000000001", label:"Jon Doe"},
-        {value:"C000000002", label:"Jane Doe"},
-    ]
+    const [customers, setCustomerDropDown]= useState<any[]>([]);
+    const [statuses, setStatusDropDown]= useState<any[]>([]);
 
-    const statuses = [
-        {value:"", label:"Please select one"},
-        {value:"1", label:"Finished"},
-        {value:"2", label:"Preprocessing"},
-        {value:"3", label:"In Progress"},
-    ]
+    useEffect(() => {
+        if (!isNew) {
+            fetchRepair(repairId);
+        }
+    }, [isNew]);
+
+    const fetchRepair = async (repairId: string | null) => {
+        try {
+            if (!repairId) {
+                throw new Error("Repair ID is missing");
+            }
+
+            const repairData = await getRepairID(repairId);
+            setRepairInfo(repairData);
+
+            const repairLineData = await getRepairLineByRepairID(repairId);
+            setRepairLineInfo(repairLineData);
+
+            
+            const customersData = await getCustomers();
+            
+            const customersList = customersData.map((customer: Customer) => {
+                return {
+                    value: customer.id,
+                    label: customer.firstName + " " + customer.lastName
+                }
+            });
+            setCustomerDropDown(customersList);
+            
+            const statusData = await getStatuses();
+            const statusesList = statusData.map((status: Status) => {
+                return {
+                    value: status.id,
+                    label: status.description
+                }
+            });
+            setStatusDropDown(statusesList);
+            
+            setSelectedCustomerType(repairData.customerId);
+            setSelectedStatus(repairData.status);
+            
+        }catch (error) {
+            console.error("Error fetching repair details and repair lines: ", error);
+        }
+    }
 
     const deleteRepairLine = () => {};
     const generateNewInvoice = () => {};
@@ -83,13 +87,13 @@ const RepairForm: React.FC = () => {
             <form>
                 <div className="column-left">
                     <DropDown label="Customer" options={customers} selectedValue={selectedCustomerType} onChange={setSelectedCustomerType} />
-                    <TextField label="Repair Date" value={repair.Date.toISOString().split("T")[0]} type="date" />
-                    <TextField label="Predicted Finish Date" value={repair.PredictedFinish.toISOString().split("T")[0]} type="date" />
+                    <TextField label="Repair Date" value={repair?.repairDate} type="date" />
+                    <TextField label="Predicted Finish Date" value={repair?.predictedFinishDate} type="date" />
                 </div>
                 <div className="column-right">
                     <DropDown label="Status" options={statuses} selectedValue={selectedStatus} onChange={setSelectedStatus} />
-                    <TextField label="Total" value={repair.Total} />
-                    <Checkbox label="Is warranty Accepted" defaultChecked={repair.isWarrantyAcccepted} />
+                    <TextField label="Total" value={repair?.total} />
+                    <Checkbox label="Is warranty Accepted" defaultChecked={repair?.isWarrantyAccepted} />
                 </div>
                 <div className="full-width">
                     <Button type="submit" variant="primary">Save</Button>

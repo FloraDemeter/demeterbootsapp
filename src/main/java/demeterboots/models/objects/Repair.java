@@ -153,13 +153,14 @@ public class Repair {
         List<Repair> repairs = new ArrayList<>();
         try (PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id.isEmpty() ? null : id);
+            stmt.setString(2, customerID.isEmpty() ? null : customerID);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Repair repair = new Repair();
                     repair.id = rs.getString("id");
                     repair.customerID = rs.getString("customerID");
-                    repair.repairDate = rs.getDate("repairDate");
-                    repair.predictedDate = rs.getDate("predictedDate");
+                    repair.repairDate = rs.getDate("date");
+                    repair.predictedDate = rs.getDate("predictedfinish");
                     repair.location = rs.getString("location");
                     repair.total = rs.getDouble("total");
                     repair.isWarrantyAccepted = rs.getBoolean("isWarrantyAccepted");

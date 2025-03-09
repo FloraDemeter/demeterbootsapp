@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { RepairTable } from '../../components/elements/table';
+import { Repair } from '../../components/interfaces/Repair';
+import { getRepairs } from '../../services/repairs';
+
 
 const RepairList: React.FC = () => {
-    const dummyrRepairData = [
-        { ID: 'R00000001', 'Customer Name': 'Anna Doe', Location: 'London',Status: "Preprocessing", Total: 100 },
-        { ID: 'R00000002', 'Customer Name': 'Josh Doe', Location: 'Chelmsford',Status: "Making", Total: 80 }
-      ];
-
-    const [repairs, setRepairs] = useState(dummyrRepairData);
+    const [repairs, setRepairs] = useState<Repair[]>([]);
 
     const fetchRepairs = async () => {
         try {
-            setRepairs(dummyrRepairData);
+            const data = await getRepairs();
+            setRepairs(data);
         } catch (error) {
             console.error("Error fetching repairs:", error);
         }
