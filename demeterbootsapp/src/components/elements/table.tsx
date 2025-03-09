@@ -131,11 +131,11 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.id}</td>
+            <td>{row.customerId}</td>
+            <td>{row.status}</td>
+            <td>{row.total}</td>
+            <td>{row.isPaid ? "Yes" : "No"}</td>
         </tr>
         ))}
     </tbody>
@@ -159,11 +159,8 @@ return (
     <tbody>
         {data.map((row, rowIndex) => (
         <tr key={rowIndex} className="border">
-            {headers.map((header, colIndex) => (
-            <td key={colIndex} className="">
-                {row[header]}
-            </td>
-            ))}
+            <td>{row.taskID}</td>
+            <td>{row.total}</td>
         </tr>
         ))}
     </tbody>

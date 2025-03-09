@@ -1,46 +1,42 @@
 
 import React, { useEffect, useState} from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TextField from '../../components/elements/textfield';
-import { InvoiceLineTable} from '../../components/elements/table';
-import Checkbox from '../../components/elements/checkbox';
 import { Button } from '../../components/elements/button';
+import Checkbox from '../../components/elements/checkbox';
+import { InvoiceLineTable} from '../../components/elements/table';
+import { Invoice, InvoiceLine } from '../../components/interfaces/Invoice';
+import { getInvoiceID, getInvoiceLineByInvoiceID } from '../../services/invoices';
 
 const InvoiceForm: React.FC = () => {
-
     const today = new Date();
+    const [searchParams] = useSearchParams();
+    const isNew = searchParams.get("view") === "new";
+    const invoiceId = searchParams.get("view");
 
-    const defaultInvoiceInfo = { 
-        CustomerName: "", 
-        Status: "", 
-        Payment: "", 
-        Total: 0, 
-        InvoiceDate: today, 
-        PaymentDate: "",
-        IsPaid: true 
-    };
-
-    const dummyInvoiceData = { 
-        CustomerName: "John Doe", 
-        Status: "In Process", 
-        Payment: "Card", 
-        Total: 5412, 
-        InvoiceDate: today, 
-        PaymentDate: "",
-        IsPaid: true 
-    };
-
-    const defaultLineInfo: any[] = [];
-    const dummyLineData = [
-        { 'Task ID': "O00000006", Price: 205 },
-        { 'Task ID': "R00000005", Price: 136 }
-    ];
-    const [lineInfo, setLineInfo] = useState(defaultLineInfo);
-    const [invoiceInfo, setInvoiceInfo] = useState(defaultInvoiceInfo);
-
+    const [lineInfo, setLineInfo] = useState<InvoiceLine[]>([]);
+    const [invoiceInfo, setInvoiceInfo] = useState<Invoice>()
     useEffect(() => {
-        setLineInfo(dummyLineData);
-        setInvoiceInfo(dummyInvoiceData);
-    }, []);
+        if (!isNew) {
+            fetchInvoice(invoiceId);
+        }
+    }, [isNew]);
+
+    const fetchInvoice = async (invoiceID: string | null) => {
+        try {
+            if (!invoiceID) {
+                throw new Error("Invoice ID is missing");
+            }
+
+            const invoiceData = await getInvoiceID(invoiceID);
+            setInvoiceInfo(invoiceData);
+
+            const lineData = await getInvoiceLineByInvoiceID(invoiceID);
+            setLineInfo(lineData);
+        } catch (error) {
+            console.error("Error fetching invoice details and lines: ", error);
+        }
+    }
 
     const openDocument = () => {
 
@@ -50,15 +46,15 @@ const InvoiceForm: React.FC = () => {
         <div className='invoice-form'>
             <form>
                 <div className="column-left">
-                    <TextField label="Customer Name" value={invoiceInfo.CustomerName} />
-                    <TextField type="date" label="Invoice Date" value={invoiceInfo.InvoiceDate.toISOString().split("T")[0]} />
-                    <TextField label="Total" value={invoiceInfo.Total} />
-                    <TextField label="Status" value={invoiceInfo.Status} />
+                    <TextField label="Customer Name" value={invoiceInfo?.customerId} />
+                    <TextField type="date" label="Invoice Date" value={invoiceInfo?.invoiceDate} />
+                    <TextField label="Total" value={invoiceInfo?.total} />
+                    <TextField label="Status" value={invoiceInfo?.status} />
                 </div>
                 <div className="column-right">
-                    <Checkbox label="Is invoice paid?" defaultChecked={invoiceInfo.IsPaid} />
-                    <TextField label="Payment Type" value={invoiceInfo.Payment} />
-                    <TextField type="date" label="Payment Date" value={invoiceInfo.PaymentDate} />
+                    <Checkbox label="Is invoice paid?" defaultChecked={invoiceInfo?.isPaid} />
+                    <TextField label="Payment Type" value={invoiceInfo?.paymentType} />
+                    <TextField type="date" label="Payment Date" value={invoiceInfo?.paymentDate} />
                     <Button type="submit" variant="primary">Update</Button>
                 </div>
             </form>

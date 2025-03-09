@@ -168,7 +168,7 @@ public class Invoice {
                     invoice.status = rs.getInt("status");
                     invoice.paymentType = rs.getInt("paymentType");
                     invoice.total = rs.getDouble("total");
-                    invoice.invoiceDate = rs.getDate("invoiceDate");
+                    invoice.invoiceDate = rs.getDate("Date");
                     invoice.paymentDate = rs.getDate("paymentDate");
                     invoice.isPaid = rs.getBoolean("isPaid");
                     invoices.add(invoice);
