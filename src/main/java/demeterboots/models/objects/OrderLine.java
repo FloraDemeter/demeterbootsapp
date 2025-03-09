@@ -150,6 +150,7 @@ public class OrderLine {
         List<OrderLine> lines = new ArrayList<>();
         try(PreparedStatement stmt = connection.prepareStatement(detailsFunction)) {
             stmt.setString(1, id.isEmpty() ? null : id);
+            stmt.setString(2, orderID.isEmpty() ? null : orderID);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     OrderLine line = new OrderLine();

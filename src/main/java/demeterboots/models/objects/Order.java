@@ -159,8 +159,8 @@ public class Order {
                     Order order = new Order();
                     order.id = rs.getString("id");
                     order.customerID = rs.getString("customerID");
-                    order.orderDate = rs.getDate("orderDate");
-                    order.predictedFinishDate = rs.getDate("predictedFinishDate");
+                    order.orderDate = rs.getDate("date");
+                    order.predictedFinishDate = rs.getDate("predictedFinish");
                     order.location = rs.getString("location");
                     order.total = rs.getDouble("total");
                     order.isWarrantyAccepted = rs.getString("isWarrantyAccepted");
