@@ -4,7 +4,7 @@
 CREATE OR REPLACE FUNCTION demeterboots.Customer_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Customer WHERE ID = p_id;
+    DELETE FROM demeterboots.Customer c WHERE c.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -16,9 +16,9 @@ BEGIN
         INSERT INTO demeterboots.Customer (FirstName, LastName, Street, PostCode, City, Email, PhoneNumber) 
         VALUES (firstname, lastname, street, postcode, city, email, phonenumber);
     ELSE
-        UPDATE demeterboots.Customer 
-        SET FirstName = firstname, LastName = lastname, Street = street, PostCode = postcode, City = city, Email = email, PhoneNumber = phonenumber 
-        WHERE ID = p_id;
+        UPDATE demeterboots.Customer c
+        SET c.FirstName = firstname, c.LastName = lastname, c.Street = street, c.PostCode = postcode, c.City = city, c.Email = email, c.PhoneNumber = phonenumber 
+        WHERE c.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -30,7 +30,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.Customer;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.Customer WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Customer c WHERE c.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -41,7 +41,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Measurements_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Measurements WHERE ID = p_id;
+    DELETE FROM demeterboots.Measurements m WHERE m.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -53,9 +53,9 @@ BEGIN
         INSERT INTO demeterboots.Measurements (CustomerID, Date, Notes, Feet, Bunion, HighPoint, Heel, Ankle, Calf, UnderKnee, Height, CalfHeight, TMark, ImagePath) 
         VALUES (customerid, date, notes, feet, bunion, highpoint, heel, ankle, calf, underknee, height, calfheight, tmark, imagepath);
     ELSE
-        UPDATE demeterboots.Measurements 
-        SET CustomerID = customerid, Date = date, Notes = notes, Feet = feet, Bunion = bunion, HighPoint = highpoint, Heel = heel, Ankle = ankle, Calf = calf, UnderKnee = underknee, Height = height, CalfHeight = calfheight, TMark = tmark, ImagePath = imagepath 
-        WHERE ID = p_id;
+        UPDATE demeterboots.Measurements m
+        SET m.CustomerID = customerid, m.Date = date, m.Notes = notes, m.Feet = feet, m.Bunion = bunion, m.HighPoint = highpoint, m.Heel = heel, m.Ankle = ankle, m.Calf = calf, m.UnderKnee = underknee, m.Height = height, m.CalfHeight = calfheight, m.TMark = tmark, m.ImagePath = imagepath 
+        WHERE m.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -71,7 +71,7 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Measurements WHERE ID = p_id;
     
     ELSIF p_customerid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Measurements WHERE CustomerID = p_customerid;
+        RETURN QUERY SELECT * FROM demeterboots.Measurements m WHERE m.CustomerID = p_customerid;
     
     END IF;
 END;
@@ -83,7 +83,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Employee_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Employee WHERE ID = p_id;
+    DELETE FROM demeterboots.Employee e WHERE e.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -95,9 +95,9 @@ BEGIN
         INSERT INTO demeterboots.Employee (FirstName, LastName, Street, PostCode, City, Email, PhoneNumber, Username, Password, IsActive, AccessLevel, StartDate, EndDate) 
         VALUES (firstname, lastname, street, postcode, city, email, phonenumber, username, password, isactive, accesslevel, startdate, enddate);
     ELSE
-        UPDATE demeterboots.Employee 
-        SET FirstName = firstname, LastName = lastname, Street = street, PostCode = postcode, City = city, Email = email, PhoneNumber = phonenumber, Username = username, Password = password, IsActive = isactive, AccessLevel = accesslevel, StartDate = startdate, EndDate = enddate 
-        WHERE ID = p_id;
+        UPDATE demeterboots.Employee e
+        SET e.FirstName = firstname, e.LastName = lastname, e.Street = street, e.PostCode = postcode, e.City = city, e.Email = email, e.PhoneNumber = phonenumber, e.Username = username, e.Password = password, e.IsActive = isactive, e.AccessLevel = accesslevel, e.StartDate = startdate, e.EndDate = enddate 
+        WHERE e.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -110,10 +110,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Employee;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Employee WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Employee e WHERE e.ID = p_id;
 
     ELSEIF p_username IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Employee WHERE Username = p_username;
+        RETURN QUERY SELECT * FROM demeterboots.Employee e WHERE e.Username = p_username;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -124,7 +124,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Order_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Orders WHERE ID = p_id;
+    DELETE FROM demeterboots.Orders o WHERE o.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -135,7 +135,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Orders (CustomerID, Date, PredictedFinish, Location, Total, IsWarrantyAccepted, Status) VALUES (customerid, date, predictedfinish, location, total, iswarrantyaccepted, status);
     ELSE
-        UPDATE demeterboots.Orders SET CustomerID = customerid, Date = date, PredictedFinish = predictedfinish, Location = location, Total = total, IsWarrantyAccepted = iswarrantyaccepted, Status = status WHERE ID = p_id;
+        UPDATE demeterboots.Orders o SET o.CustomerID = customerid, o.Date = date, o.PredictedFinish = predictedfinish, o.Location = location, o.Total = total, o.IsWarrantyAccepted = iswarrantyaccepted, o.Status = status WHERE o.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -148,11 +148,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Orders;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Orders WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Orders o WHERE o.ID = p_id;
 
     ELSEIF p_customerid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Orders WHERE CustomerID = p_customerid;
-
+        RETURN QUERY SELECT * FROM demeterboots.Orders o WHERE o.CustomerID = p_customerid;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -163,7 +162,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.OrderLine_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.OrderLine WHERE ID = p_id;
+    DELETE FROM demeterboots.OrderLine o WHERE o.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -174,7 +173,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.OrderLine (OrderID, ProductTypeID, LeatherID, ProductStyle, Price, Notes) VALUES (orderid, producttypeid, leatherid, productstyle, price, notes);
     ELSE
-        UPDATE demeterboots.OrderLine SET OrderID = orderid, ProductTypeID = producttypeid, LeatherID = leatherid, ProductStyle = productstyle, Price = price, Notes = notes WHERE ID = p_id;
+        UPDATE demeterboots.OrderLine o SET o.OrderID = orderid, o.ProductTypeID = producttypeid, o.LeatherID = leatherid, o.ProductStyle = productstyle, o.Price = price, o.Notes = notes WHERE o.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -187,10 +186,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.OrderLine;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.OrderLine WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.OrderLine o WHERE o.ID = p_id;
 
     ELSEIF p_orderid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.OrderLine WHERE OrderID = p_orderid;
+        RETURN QUERY SELECT * FROM demeterboots.OrderLine o WHERE o.OrderID = p_orderid;
 
     END IF;
 END;
@@ -202,7 +201,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Repair_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Repair WHERE ID = p_id;
+    DELETE FROM demeterboots.Repair r WHERE r.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -213,7 +212,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Repair (CustomerID, Date, PredictedFinish, Location, Total, IsWarrantyAccepted, Status) VALUES (customerid, date, predictedfinish, location, total, iswarrantyaccepted, status);
     ELSE
-        UPDATE demeterboots.Repair SET CustomerID = customerid, Date = date, PredictedFinish = predictedfinish, Location = location, Total = total, IsWarrantyAccepted = iswarrantyaccepted, Status = status WHERE ID = p_id;
+        UPDATE demeterboots.Repair r SET r.CustomerID = customerid, r.Date = date, r.PredictedFinish = predictedfinish, r.Location = location, r.Total = total, r.IsWarrantyAccepted = iswarrantyaccepted, r.Status = status WHERE r.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -226,10 +225,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Repair;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Repair WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Repair r WHERE r.ID = p_id;
 
     ELSEIF p_customerid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Repair WHERE CustomerID = p_customerid;
+        RETURN QUERY SELECT * FROM demeterboots.Repair r WHERE r.CustomerID = p_customerid;
 
     END IF;
 END;
@@ -241,34 +240,34 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.RepairLine WHERE ID = p_id;
+    DELETE FROM demeterboots.RepairLine r WHERE ID = r.p_id;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in RepairLine
-CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Commit(p_id VARCHAR, repairid VARCHAR, producttypeid INT, repaircategoryid INT, price NUMERIC, notes VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Commit(p_id VARCHAR, repairid VARCHAR, repaircategoryid INT, price NUMERIC, notes VARCHAR)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.RepairLine (RepairID, ProductTypeID, RepairCategoryID, Price, Notes) VALUES (repairid, producttypeid, repaircategoryid, price, notes);
+        INSERT INTO demeterboots.RepairLine (RepairID, RepairCategoryID, Price, Notes) VALUES (repairid, repaircategoryid, price, notes);
     ELSE
-        UPDATE demeterboots.RepairLine SET RepairID = repairid, ProductTypeID = producttypeid, RepairCategoryID = repaircategoryid, Price = price, Notes = notes WHERE ID = p_id;
+        UPDATE demeterboots.RepairLine r SET r.RepairID = repairid, r.RepairCategoryID = repaircategoryid, r.Price = price, r.Notes = notes WHERE r.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from RepairLine
 CREATE OR REPLACE FUNCTION demeterboots.RepairLine_Details(p_id VARCHAR DEFAULT NULL, p_repairid VARCHAR DEFAULT NULL)
-RETURNS TABLE (id VARCHAR, repairid VARCHAR, producttypeid INT, repaircategoryid INT, price NUMERIC, notes VARCHAR) AS $$
+RETURNS TABLE (id VARCHAR, repairid VARCHAR, repaircategoryid INT, price NUMERIC, notes VARCHAR) AS $$
 BEGIN
     IF p_id IS NULL AND p_repairID IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.RepairLine;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.RepairLine WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.RepairLine r WHERE r.ID = p_id;
 
     ELSEIF p_repairid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.RepairLine WHERE RepairID = p_repairid;
+        RETURN QUERY SELECT * FROM demeterboots.RepairLine r WHERE r.RepairID = p_repairid;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -279,7 +278,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Invoice_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Invoice WHERE ID = p_id;
+    DELETE FROM demeterboots.Invoice i WHERE i.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -290,7 +289,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Invoice (CustomerID, Status, PaymentType, Total, Date, PaymentDate, IsPaid) VALUES (customerid, status, paymenttype, total, date, paymentdate, ispaid);
     ELSE
-        UPDATE demeterboots.Invoice SET CustomerID = customerid, Status = status, PaymentType = paymenttype, Total = total, Date = date, PaymentDate = paymentdate, IsPaid = ispaid WHERE ID = p_id;
+        UPDATE demeterboots.Invoice i SET i.CustomerID = customerid, i.Status = status, i.PaymentType = paymenttype, i.Total = total, i.Date = date, i.PaymentDate = paymentdate, i.IsPaid = ispaid WHERE i.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -303,10 +302,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Invoice;
     
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Invoice WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Invoice i WHERE i.ID = p_id;
 
     ELSEIF p_customerid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Invoice WHERE CustomerID = p_customerid;
+        RETURN QUERY SELECT * FROM demeterboots.Invoice i WHERE i.CustomerID = p_customerid;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -317,7 +316,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.InvoiceLine_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.InvoiceLine WHERE ID = p_id;
+    DELETE FROM demeterboots.InvoiceLine i WHERE i.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -328,7 +327,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.InvoiceLine (InvoiceID, TaskID, TaskType, Total) VALUES (invoiceid, taskid, tasktype, total);
     ELSE
-        UPDATE demeterboots.InvoiceLine SET InvoiceID = invoiceid, TaskID = taskid, TaskType = tasktype, Total = total WHERE ID = p_id;
+        UPDATE demeterboots.InvoiceLine i SET i.InvoiceID = invoiceid, i.TaskID = taskid, i.TaskType = tasktype, i.Total = total WHERE i.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -341,10 +340,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.InvoiceLine;
     
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.InvoiceLine WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.InvoiceLine i WHERE i.ID = p_id;
     
     ELSEIF p_invoiceid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.InvoiceLine WHERE InvoiceID = p_invoiceid;
+        RETURN QUERY SELECT * FROM demeterboots.InvoiceLine i WHERE i.InvoiceID = p_invoiceid;
     
     END IF;
 END;
@@ -356,7 +355,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Job_Delete(p_id VARCHAR)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Job WHERE ID = p_id;
+    DELETE FROM demeterboots.Job j WHERE j.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -367,7 +366,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Job (EmployeeID, Status, TaskID, TaskType) VALUES (employeeid, status, taskid, tasktype);
     ELSE
-        UPDATE demeterboots.Job SET EmployeeID = employeeid, Status = status, TaskID = taskid, TaskType = tasktype WHERE ID = p_id;
+        UPDATE demeterboots.Job j SET j.EmployeeID = employeeid, j.Status = status, j.TaskID = taskid, j.TaskType = tasktype WHERE j.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -380,10 +379,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Job;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Job WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Job j WHERE j.ID = p_id;
         
     ELSEIF p_employeeid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Job WHERE EmployeeID = p_employeeid;
+        RETURN QUERY SELECT * FROM demeterboots.Job j WHERE j.EmployeeID = p_employeeid;
 
     END IF;
 END;
@@ -395,7 +394,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.JobNotification_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.JobNotification WHERE ID = p_id;
+    DELETE FROM demeterboots.JobNotification j WHERE j.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -406,7 +405,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.JobNotification (PreviousEmployeeID, NewEmployeeID, IsNotified, TaskID, TaskType) VALUES (previousemployeeid, newemployeeid, isnotified, taskid, tasktype);
     ELSE
-        UPDATE demeterboots.JobNotification SET PreviousEmployeeID = previousemployeeid, NewEmployeeID = newemployeeid, IsNotified = isnotified, TaskID = taskid, TaskType = tasktype WHERE ID = p_id;
+        UPDATE demeterboots.JobNotification j SET j.PreviousEmployeeID = previousemployeeid, j.NewEmployeeID = newemployeeid, j.IsNotified = isnotified, j.TaskID = taskid, j.TaskType = tasktype WHERE j.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -418,7 +417,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.JobNotification;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.JobNotification WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.JobNotification j WHERE j.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -427,7 +426,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.JobNotification_NotNotified(p_employeeid VARCHAR)
 RETURNS TABLE (id INT, previousemployeeid VARCHAR, newemployeeid VARCHAR, isnotified BOOL, taskid VARCHAR, tasktype VARCHAR) AS $$
 BEGIN
-    RETURN QUERY SELECT * FROM demeterboots.JobNotification WHERE IsNotified = FALSE AND NewEmployeeID = p_employeeid;
+    RETURN QUERY SELECT * FROM demeterboots.JobNotification j WHERE j.IsNotified = FALSE AND j.NewEmployeeID = p_employeeid;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -437,30 +436,30 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.ProductType_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.ProductType WHERE ID = p_id;
+    DELETE FROM demeterboots.ProductType p WHERE p.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in ProductType
-CREATE OR REPLACE FUNCTION demeterboots.ProductType_Commit(p_id INT, description VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.ProductType_Commit(p_id INT, description VARCHAR, price NUMERIC)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.ProductType (Description) VALUES (description);
+        INSERT INTO demeterboots.ProductType (Description, Price) VALUES (description, price);
     ELSE
-        UPDATE demeterboots.ProductType SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.ProductType p SET p.Description = description, p.Price = price WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from ProductType
 CREATE OR REPLACE FUNCTION demeterboots.ProductType_Details(p_id INT DEFAULT NULL)
-RETURNS TABLE (id INT, description VARCHAR) AS $$
+RETURNS TABLE (id INT, description VARCHAR, price NUMERIC) AS $$
 BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.ProductType;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.ProductType WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.ProductType p WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -471,7 +470,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.ProductStyle_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.ProductStyle WHERE ID = p_id;
+    DELETE FROM demeterboots.ProductStyle p WHERE p.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -482,7 +481,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.ProductStyle (ProductStyleTypeID, Description) VALUES (productstyletypeid, description);
     ELSE
-        UPDATE demeterboots.ProductStyle SET ProductStyleTypeID = productstyletypeid, Description = description WHERE ID = p_id;
+        UPDATE demeterboots.ProductStyle p SET p.ProductStyleTypeID = productstyletypeid, p.Description = description WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -495,10 +494,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.ProductStyle;
     
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.ProductStyle WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.ProductStyle p WHERE p.ID = p_id;
 
     ELSEIF p_productstyletypeid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.ProductStyle WHERE ProductStyleTypeID = p_productstyletypeid;
+        RETURN QUERY SELECT * FROM demeterboots.ProductStyle p WHERE p.ProductStyleTypeID = p_productstyletypeid;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -509,7 +508,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.ProductStyleType_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.ProductStyleType WHERE ID = p_id;
+    DELETE FROM demeterboots.ProductStyleType p WHERE p.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -520,7 +519,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.ProductStyleType (Description) VALUES (description);
     ELSE
-        UPDATE demeterboots.ProductStyleType SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.ProductStyleType p SET p.Description = description WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -532,7 +531,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.ProductStyleType;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.ProductStyleType WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.ProductStyleType p WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -543,34 +542,34 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.RepairCategory WHERE ID = p_id;
+    DELETE FROM demeterboots.RepairCategory r WHERE r.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to insert or update a record in RepairCategory
-CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Commit(p_id INT, producttypeid INT, description VARCHAR)
+CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Commit(p_id INT, producttypeid INT, description VARCHAR, price NUMERIC)
 RETURNS VOID AS $$
 BEGIN
     IF p_id IS NULL THEN
-        INSERT INTO demeterboots.RepairCategory (ProductTypeID, Description) VALUES (producttypeid, description);
+        INSERT INTO demeterboots.RepairCategory (ProductTypeID, Description, Price) VALUES (producttypeid, description, price);
     ELSE
-        UPDATE demeterboots.RepairCategory SET ProductTypeID = producttypeid, Description = description WHERE ID = p_id;
+        UPDATE demeterboots.RepairCategory r SET r.ProductTypeID = producttypeid, r.Description = description, r.Price = price WHERE r.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Function to select records from RepairCategory
 CREATE OR REPLACE FUNCTION demeterboots.RepairCategory_Details(p_id INT DEFAULT NULL, p_producttypeid INT DEFAULT NULL)
-RETURNS TABLE (id INT, producttypeid INT, description VARCHAR) AS $$
+RETURNS TABLE (id INT, producttypeid INT, description VARCHAR, price NUMERIC) AS $$
 BEGIN
     IF p_id IS NULL AND p_producttypeid IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.RepairCategory;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.RepairCategory WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.RepairCategory r WHERE r.ID = p_id;
 
     ELSEIF p_producttypeid IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.RepairCategory WHERE ProductTypeID = p_producttypeid;
+        RETURN QUERY SELECT * FROM demeterboots.RepairCategory r WHERE r.ProductTypeID = p_producttypeid;
 
     END IF;
 END;
@@ -582,7 +581,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Leather_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Leather WHERE ID = p_id;
+    DELETE FROM demeterboots.Leather l WHERE l.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -593,7 +592,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Leather (Colour, Description, ImagePath, IsAvailable) VALUES (colour, description, imagepath, isavailable);
     ELSE
-        UPDATE demeterboots.Leather SET Colour = colour, Description = description, ImagePath = imagepath, IsAvailable = isavailable WHERE ID = p_id;
+        UPDATE demeterboots.Leather l SET l.Colour = colour, l.Description = description, l.ImagePath = imagepath, l.IsAvailable = isavailable WHERE l.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -606,10 +605,10 @@ BEGIN
         RETURN QUERY SELECT * FROM demeterboots.Leather;
 
     ELSEIF p_id IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Leather WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Leather l WHERE l.ID = p_id;
 
     ELSEIF p_isavailable IS NOT NULL THEN
-        RETURN QUERY SELECT * FROM demeterboots.Leather WHERE IsAvailable = p_isavailable;
+        RETURN QUERY SELECT * FROM demeterboots.Leather l WHERE l.IsAvailable = p_isavailable;
 
     END IF;
 END;
@@ -621,7 +620,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.Status_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.Status WHERE ID = p_id;
+    DELETE FROM demeterboots.Status s WHERE s.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -632,7 +631,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.Status (Description) VALUES (description);
     ELSE
-        UPDATE demeterboots.Status SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.Status s SET s.Description = description WHERE s.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -644,7 +643,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.Status;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.Status WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.Status s WHERE s.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -655,7 +654,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.AccessLevel_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.AccessLevel WHERE ID = p_id;
+    DELETE FROM demeterboots.AccessLevel a WHERE a.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -666,7 +665,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.AccessLevel (Description) VALUES (description);
     ELSE
-        UPDATE demeterboots.AccessLevel SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.AccessLevel a SET a.Description = description WHERE a.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -678,7 +677,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.AccessLevel;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.AccessLevel WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.AccessLevel a WHERE a.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -689,7 +688,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION demeterboots.PaymentType_Delete(p_id INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM demeterboots.PaymentType WHERE ID = p_id;
+    DELETE FROM demeterboots.PaymentType p WHERE p.ID = p_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -700,7 +699,7 @@ BEGIN
     IF p_id IS NULL THEN
         INSERT INTO demeterboots.PaymentType (Description) VALUES (description);
     ELSE
-        UPDATE demeterboots.PaymentType SET Description = description WHERE ID = p_id;
+        UPDATE demeterboots.PaymentType p SET p.Description = description WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -712,7 +711,7 @@ BEGIN
     IF p_id IS NULL THEN
         RETURN QUERY SELECT * FROM demeterboots.PaymentType;
     ELSE
-        RETURN QUERY SELECT * FROM demeterboots.PaymentType WHERE ID = p_id;
+        RETURN QUERY SELECT * FROM demeterboots.PaymentType p WHERE p.ID = p_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;

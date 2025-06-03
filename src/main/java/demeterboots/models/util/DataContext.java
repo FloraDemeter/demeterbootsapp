@@ -21,6 +21,11 @@ public final class DataContext {
         Properties properties = GetProperties();
 
         try {
+                
+                System.out.println("DB_PASSWORD: " + System.getenv("DB_PASSWORD"));
+                System.out.println("DB_PASSWORD: " + properties.getProperty("spring.datasource.password"));
+
+
                 connection = DriverManager.getConnection(
                 properties.getProperty("spring.datasource.url"),
                 properties.getProperty("spring.datasource.username"),
